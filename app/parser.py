@@ -46,12 +46,9 @@ class Parser:
         attributes = self.parse_background()
         self.bg = Background(attributes[0],attributes[1],attributes[2])
         return self.bg
-
-
-
     
-
     # shapes:
+
     def findShapes(self, diagram: Diagram):
         for index, element in enumerate(self.root[2][0][0]):
             
@@ -108,6 +105,7 @@ class Parser:
 
 
 #test
+#CiaoAntonella
 
 
 
