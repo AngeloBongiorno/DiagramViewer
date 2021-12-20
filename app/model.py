@@ -59,10 +59,20 @@ class Diagram:
         self.shapes = shapes
         self.connectors = connectors
 
+    #def add_background(self):
+        
+
     def addConnector(self, element: Element, index: int):
         self.connectors.append(Connector(element.tag,element[index][0].attrib['X'],element[index][0].attrib['Y'],
             element[index][1].attrib['X'],element[index][1].attrib['Y'], element.attrib['Background']))
 
+
+# serve ad aggiungere alla shape eventuale elenco di stereotypes che implementa, questi sono necessari
+    # perché mostrati nella rappresentazione grafica del diagramma
+#    def matchStereotypes(self, stypes):
+#        for stereotype in stypes:
+#            self.stereotypes.append(stereotype.attrib['Name'])
+#            # print('questa è una ' + stereotype.attrib['Name'])
 #test
 sh_list=(sh1,sh2)
 cn_list=(cn1,cn2)
