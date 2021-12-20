@@ -1,12 +1,8 @@
-from typing import List
+import typing
 import xml.etree.ElementTree as ET
+from model import Background
 
-
-
-from connector import Connector
-from shape import Shape
-from diagram import Diagram
-# capire come fare import da directory sorella
+from model import Connector, Shape, Diagram
 
 class XT:
     """XML tags namespace."""
@@ -15,29 +11,48 @@ class XT:
 
 class XA:
     """XML attributes namespace."""
+    NAME = 'Name'
+    MODEL = 'Model'
+    X = 'X'
+    Y = 'Y'
+    WIDTH = 'Width'
+    HEIGHT = 'Height'
+    DIAGRAMBACKGROUND = 'DiagramBackground'
+    BACKGROUND = 'Background'
 
 
 class Parser:
+
     def __init__(self):
-        self._diagram = Diagram()
         #self.tree = ET.parse(path)
-        #self.tree = ET.parse('./assets/class_diagram_3.xml')
+        #self.tree = ET.parse('./assets/class_diagram_3.xml') # per prova
         #self.root = self.tree.getroot()
-        #self.diagram = self.makeDiagram()
+        pass
 
-    def makeDiagram(self) -> Diagram:
-        diagram = Diagram(self.root[2][0].attrib['Width'], self.root[2][0].attrib['Height'], self.root[2][0].attrib['DiagramBackground'])
-        print(diagram)
-        return diagram
-
-
-
-    def parse_shapes(self):
-        self.root[2][0][0].findall(XT.CLASS)
+    def parse(self): # nell'argomento andrebbe inserito anche il path
+        self.tree = ET.parse('./assets/class_diagram_3.xml') # per prova
+        self.root = self.tree.getroot()
+        self.background = self.make_background()
+        #self.parsed_connectors = 
 
 
-# shapes:
-    def findShapes(self, diagram: Diagram) -> List:
+    def parse_background(self) -> typing.Tuple:
+        self.bg_width = self.root[2][0].attrib[XA.WIDTH]
+        self.bg_height = self.root[2][0].attrib[XA.HEIGHT]
+        self.bg_color = self.root[2][0].attrib[XA.DIAGRAMBACKGROUND]
+        return self.bg_width, self.bg_height, self.bg_color
+
+    def make_background(self) -> Background:
+        attributes = self.parse_background()
+        self.bg = Background(attributes[0],attributes[1],attributes[2])
+        return self.bg
+
+
+
+    
+
+    # shapes:
+    def findShapes(self, diagram: Diagram):
         for index, element in enumerate(self.root[2][0][0]):
             
             
@@ -56,12 +71,49 @@ class Parser:
 
 
         # connectors:
-        #   
-    for element in self.root[2][0][1]:
-        #print(element.tag)
-        for index, point in enumerate(element):
-            if point.tag == 'Points':
-                #diagram.connectors.append(Connector(element.tag,element[index][0].attrib['X'],element[index][0].attrib['Y'],element[index][1].attrib['X'],element[index][1].attrib['Y'], element.attrib['Background']))
-                diagram.addConnector(element,index)
-                #print("point in posizione " + str(index) + " trovato " + point.tag)
+    def find_connector():    #   
+        for element in self.root[2][0][1]:
+            #print(element.tag)
+            for index, point in enumerate(element):
+                if point.tag == 'Points':
+                    #diagram.connectors.append(Connector(element.tag,element[index][0].attrib['X'],element[index][0].attrib['Y'],element[index][1].attrib['X'],element[index][1].attrib['Y'], element.attrib['Background']))
+                    diagram.addConnector(element,index)
+                    #print("point in posizione " + str(index) + " trovato " + point.tag)
+
+    #def make_shapes(self):
+    #    for shape in self.root[2][0][0].findall(XT.CLASS):
+    #        self.name = shape.attrib[XA.NAME]
+    #        self.model = shape.attrib[XA.MODEL]
+    #        self.x = shape.attrib[XA.X]
+    #        self.y = shape.attrib[XA.Y]
+    #        self.bgcolor = shape.attrib[XA.BACKGROUND]
+    #        self.width = shape.attrib[XA.WIDTH]
+    #        self.height = shape.attrib[XA.HEIGHT]
+    #        for shape_data in self.root[1]:
+
+
+
+    #def make_connectors(self):
+        
+                        
+
+
+
+
+    
+
+    #def make_diagram(self, bg: Background) -> Diagram:
+    #    diagram = Diagram(bg,)
+     #   return diagram
+
+
+#test
+
+
+
+
+    
+
+
+
 
