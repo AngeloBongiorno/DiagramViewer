@@ -1,6 +1,4 @@
 from typing import List
-
-
 class Shape:
 
     def __init__(self, name: str, model: str, x: int, y: int, bgcolor: str, width: int, height: int) -> None:

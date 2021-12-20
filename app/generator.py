@@ -1,7 +1,7 @@
 from typing import Any
 import PIL
 
-from parser.diagram import Diagram
+from app.model import Diagram
 
 class Generatore:
 
