@@ -1,18 +1,22 @@
 from typing import Any
-import PIL
+from PIL import Image
 
-from app.model import Diagram
+from app.model import Background, Diagram
 
-class Generatore:
+class Generator:
 
     def __init__(self, diagram: Diagram) -> None:
-        self.bg = self.setBackground(diagram)
+        pass
+
+    def draw_diagram(self, diagram: Diagram):
+        self.draw_background(diagram.background)
 
     # funzione sfondo
-    def setBackground(self, diagram: Diagram) -> Any:
-        bg = PIL.Image.new('RGBA', diagram.size, diagram.color)
-        
+    def draw_background(self, bg_info: Background) -> Image:
+        size = (bg_info.width, bg_info.height)
+        bg = Image.new('RGBA', size, bg_info.color)
         return bg
+
         # v test
         bg.show()
         # ^ test
