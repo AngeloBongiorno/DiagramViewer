@@ -1,3 +1,4 @@
+from typing import List
 import typing
 import xml.etree.ElementTree as ET
 from model import Background
@@ -8,6 +9,7 @@ class XT:
     """XML tags namespace."""
     CLASS = 'Class'
     POINTS = 'Points'
+    STEREOTYPES = 'Stereotypes'
 
 class XA:
     """XML attributes namespace."""
@@ -19,6 +21,7 @@ class XA:
     HEIGHT = 'Height'
     DIAGRAMBACKGROUND = 'DiagramBackground'
     BACKGROUND = 'Background'
+    ID = 'Id'
 
 
 class Parser:
@@ -29,16 +32,19 @@ class Parser:
         #self.root = self.tree.getroot()
         pass
 
-    def parse(self): # nell'argomento andrebbe inserito anche il path
-        self.tree = ET.parse('./assets/class_diagram_3.xml') # per prova
+    def parse(self) -> Diagram: # nell'argomento andrebbe inserito anche il path
+        self.tree = ET.parse('./assets/project.xml') # per prova
         self.root = self.tree.getroot()
         self.background = self.make_background()
+        self.shapes = self.make_shapes()
+        self.connectors = self.make_connectors()
+        return Diagram(self.background, self.shapes, self.connectors)
         #self.parsed_connectors = 
 
 
     def parse_background(self) -> typing.Tuple:
-        self.bg_width = self.root[2][0].attrib[XA.WIDTH]
-        self.bg_height = self.root[2][0].attrib[XA.HEIGHT]
+        self.bg_width = int(self.root[2][0].attrib[XA.WIDTH])
+        self.bg_height = int(self.root[2][0].attrib[XA.HEIGHT])
         self.bg_color = self.root[2][0].attrib[XA.DIAGRAMBACKGROUND]
         return self.bg_width, self.bg_height, self.bg_color
 
@@ -49,33 +55,46 @@ class Parser:
     
     # shapes:
 
-    def findShapes(self, diagram: Diagram):
+    def make_shapes(self) -> List[Shape]:
+        self.shape_list = []
         for index, element in enumerate(self.root[2][0][0]):
             
-            
-            diagram.shapes.append(Shape(element.attrib['Name'], element.attrib['Model'], element.attrib['X'], element.attrib['Y'],
-                element.attrib['Background'], element.attrib['Width'], element.attrib['Height']))
+            self.shape_list.append(Shape(element.attrib[XA.NAME], element.attrib[XA.MODEL], float(element.attrib[XA.X]), float(element.attrib[XA.Y]),
+                element.attrib[XA.BACKGROUND], float(element.attrib[XA.WIDTH]), float(element.attrib[XA.HEIGHT])))
 
-            model = element.attrib['Model']
+            model = element.attrib[XA.MODEL]
             # nel tag model (root[1]), scorre tutti gli elementi finché non trova quello
             # corrispondente alla shape appena istanziata.
             for class_instance in self.root[1]:
-                if class_instance.attrib['Id'] == model:
+                if class_instance.attrib[XA.ID] == model:
                     # Trovata, scorre tutte le sottoclassi dell'elemento fino a trovare la sottoclasse 'Stereotypes'
                     for sub_class in class_instance:
-                        if sub_class.tag == 'Stereotypes':
-                            diagram.shapes[index].matchStereotypes(sub_class)
+                        if sub_class.tag == XT.STEREOTYPES:
+                            self.shape_list[index].matchStereotypes(sub_class)
+        return self.shape_list
+
 
 
         # connectors:
-    def find_connector():    #   
+    def make_connectors(self) -> List[Connector]:
+        self.connector_list = []   
         for element in self.root[2][0][1]:
             #print(element.tag)
-            for index, point in enumerate(element):
-                if point.tag == 'Points':
-                    #diagram.connectors.append(Connector(element.tag,element[index][0].attrib['X'],element[index][0].attrib['Y'],element[index][1].attrib['X'],element[index][1].attrib['Y'], element.attrib['Background']))
-                    diagram.addConnector(element,index)
+            for index, line in enumerate(element):
+                if line.tag == XT.POINTS:
+                    line_coordinates = []
+                    for n, _ in enumerate(line):
+                        line_coordinates.append((float(element[index][n].attrib['X']), float(element[index][n].attrib['Y'])))
+                    self.connector_list.append(Connector(element.tag, line_coordinates, element.attrib['Background']))
+                    
+                        
+                    #self.connector_list.append(Connector(element.tag,float(element[index][0].attrib['X']),float(element[index][0].attrib['Y']),
+                    #    float(element[index][1].attrib['X']),float(element[index][1].attrib['Y']), element.attrib['Background']))
                     #print("point in posizione " + str(index) + " trovato " + point.tag)
+        return self.connector_list
+
+
+
 
     #def make_shapes(self):
     #    for shape in self.root[2][0][0].findall(XT.CLASS):

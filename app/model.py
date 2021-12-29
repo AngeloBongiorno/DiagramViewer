@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from xml.etree.ElementTree import Element
 
 
@@ -12,11 +12,11 @@ class Background:
         #    self.root[2][0].attrib['Height'], self.root[2][0].attrib['DiagramBackground'])
 
 #test
-bg=Background(100,100,'rgb(255,255,255)')
+#bg=Background(100,100,'rgb(255,255,255)')
 
 class Shape:
 
-    def __init__(self, name: str, model: str, x: int, y: int, bgcolor: str, width: int, height: int, stereotypes: List[str]) -> None:
+    def __init__(self, name: str, model: str, x: int, y: int, bgcolor: str, width: int, height: int) -> None:
         self.name = name
         self.model = model
         self.x = x
@@ -24,7 +24,7 @@ class Shape:
         self.bgcolor = bgcolor
         self.width = width
         self.height = height
-        self.stereotypes = stereotypes
+        self.stereotypes = []
 
     # serve ad aggiungere alla shape eventuale elenco di stereotypes che implementa, questi sono necessari
     # perché mostrati nella rappresentazione grafica del diagramma
@@ -35,22 +35,23 @@ class Shape:
             # print('questa è una ' + stereotype.attrib['Name'])
 
 #test
-sh1=Shape('lollo','1234asdf',5,5,'rgb(1,2,3)',20,20,['Interface','boh'])
-sh2=Shape('vecio','1234asdf',5,5,'rgb(1,2,3)',20,20,['boh','qwerty'])
+#sh1=Shape('lollo','1234asdf',5,5,'rgb(1,2,3)',20,20,['Interface','boh'])
+#sh2=Shape('vecio','1234asdf',5,5,'rgb(1,2,3)',20,20,['boh','qwerty'])
 
 class Connector:
 
-    def __init__(self, tag: str, startx: int, starty: int, endx: int, endy: int, bgcolor: str) -> None:
+    def __init__(self, tag: str, coordinates: List[Tuple], bgcolor: str) -> None:
         self.tag = tag
-        self.startx = startx
-        self.starty = starty
-        self.endx = endx
-        self.endy = endy
+        self.coordinates = coordinates
+        #self.startx = startx
+        #self.starty = starty
+        #self.endx = endx
+        #self.endy = endy
         self.bgcolor = bgcolor
 
 #test
-cn1=Connector('lolla',6,6,9,9,'rgb(1,2,3)')
-cn2=Connector('vecia',6,6,9,9,'rgb(1,2,3)')
+#cn1=Connector('lolla',6,6,9,9,'rgb(1,2,3)')
+#cn2=Connector('vecia',6,6,9,9,'rgb(1,2,3)')
 
 class Diagram:
 
@@ -59,9 +60,8 @@ class Diagram:
         self.shapes = shapes
         self.connectors = connectors
 
-    #def add_background(self):
         
-
+    #da togliere
     def addConnector(self, element: Element, index: int):
         self.connectors.append(Connector(element.tag,element[index][0].attrib['X'],element[index][0].attrib['Y'],
             element[index][1].attrib['X'],element[index][1].attrib['Y'], element.attrib['Background']))
@@ -74,7 +74,7 @@ class Diagram:
 #            self.stereotypes.append(stereotype.attrib['Name'])
 #            # print('questa è una ' + stereotype.attrib['Name'])
 #test
-sh_list=(sh1,sh2)
-cn_list=(cn1,cn2)
-dg=Diagram(bg,sh_list,cn_list)
-print('hello')
+#sh_list=(sh1,sh2)
+#cn_list=(cn1,cn2)
+#dg=Diagram(bg,sh_list,cn_list)
+#print('hello')
