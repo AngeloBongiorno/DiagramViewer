@@ -10,6 +10,9 @@ class XT:
     CLASS = 'Class'
     POINTS = 'Points'
     STEREOTYPES = 'Stereotypes'
+    MODELCHILDREN = 'ModelChildren'
+    ATTRIBUTE = 'Attribute'
+    OPERATION = 'Operation'
 
 class XA:
     """XML attributes namespace."""
@@ -33,7 +36,7 @@ class Parser:
         pass
 
     def parse(self) -> Diagram: # nell'argomento andrebbe inserito anche il path
-        self.tree = ET.parse('./assets/project.xml') # per prova
+        self.tree = ET.parse('./assets/class_diagram_3.xml') # per prova
         self.root = self.tree.getroot()
         self.background = self.make_background()
         self.shapes = self.make_shapes()
@@ -70,7 +73,10 @@ class Parser:
                     # Trovata, scorre tutte le sottoclassi dell'elemento fino a trovare la sottoclasse 'Stereotypes'
                     for sub_class in class_instance:
                         if sub_class.tag == XT.STEREOTYPES:
-                            self.shape_list[index].matchStereotypes(sub_class)
+                            self.shape_list[index].match_stereotypes(sub_class)
+                        if sub_class.tag == XT.MODELCHILDREN:
+                            self.shape_list[index].match_attributes_operations(sub_class)
+                            print('ciao')
         return self.shape_list
 
 

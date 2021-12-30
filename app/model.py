@@ -24,19 +24,25 @@ class Shape:
         self.bgcolor = bgcolor
         self.width = width
         self.height = height
+        self.operations = []
+        self.attributes = []
         self.stereotypes = []
 
     # serve ad aggiungere alla shape eventuale elenco di stereotypes che implementa, questi sono necessari
     # perché mostrati nella rappresentazione grafica del diagramma
     # potrebbe non servire
-    def matchStereotypes(self, stypes):
+    def match_stereotypes(self, stypes):
         for stereotype in stypes:
             self.stereotypes.append(stereotype.attrib['Name'])
-            # print('questa è una ' + stereotype.attrib['Name'])
 
-#test
-#sh1=Shape('lollo','1234asdf',5,5,'rgb(1,2,3)',20,20,['Interface','boh'])
-#sh2=Shape('vecio','1234asdf',5,5,'rgb(1,2,3)',20,20,['boh','qwerty'])
+    def match_attributes_operations(self, model_children):
+        for model_child in model_children:
+            if model_child.tag == 'Attribute':
+                self.attributes.append(model_child.attrib['Name'])
+            if model_child.tag == 'Operation':
+                self.operations.append(model_child.attrib['Name'])
+
+    
 
 class Connector:
 
@@ -49,10 +55,6 @@ class Connector:
         #self.endy = endy
         self.bgcolor = bgcolor
 
-#test
-#cn1=Connector('lolla',6,6,9,9,'rgb(1,2,3)')
-#cn2=Connector('vecia',6,6,9,9,'rgb(1,2,3)')
-
 class Diagram:
 
     def __init__(self, background: Background, shapes: List[Shape], connectors: List[Connector]):
@@ -60,21 +62,4 @@ class Diagram:
         self.shapes = shapes
         self.connectors = connectors
 
-        
-    #da togliere
-    def addConnector(self, element: Element, index: int):
-        self.connectors.append(Connector(element.tag,element[index][0].attrib['X'],element[index][0].attrib['Y'],
-            element[index][1].attrib['X'],element[index][1].attrib['Y'], element.attrib['Background']))
 
-
-# serve ad aggiungere alla shape eventuale elenco di stereotypes che implementa, questi sono necessari
-    # perché mostrati nella rappresentazione grafica del diagramma
-#    def matchStereotypes(self, stypes):
-#        for stereotype in stypes:
-#            self.stereotypes.append(stereotype.attrib['Name'])
-#            # print('questa è una ' + stereotype.attrib['Name'])
-#test
-#sh_list=(sh1,sh2)
-#cn_list=(cn1,cn2)
-#dg=Diagram(bg,sh_list,cn_list)
-#print('hello')
