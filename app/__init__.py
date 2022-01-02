@@ -1,5 +1,4 @@
 from generator import Generator
-from model import Diagram
 from parser import Parser
 
 parser = Parser()

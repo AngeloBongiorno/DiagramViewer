@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 import typing
 import xml.etree.ElementTree as ET
 from model import Background
@@ -13,6 +13,9 @@ class XT:
     MODELCHILDREN = 'ModelChildren'
     ATTRIBUTE = 'Attribute'
     OPERATION = 'Operation'
+    LINE = 'Line'
+    SHAPES = 'Shapes'
+    CONNECTORS = 'Connectors'
 
 class XA:
     """XML attributes namespace."""
@@ -25,7 +28,9 @@ class XA:
     DIAGRAMBACKGROUND = 'DiagramBackground'
     BACKGROUND = 'Background'
     ID = 'Id'
-
+    COLOR = 'Color'
+    WEIGHT = 'Weight'
+    PRIMITIVESHAPETYPE = 'PrimitiveShapeType'
 
 class Parser:
 
@@ -36,7 +41,8 @@ class Parser:
         pass
 
     def parse(self) -> Diagram: # nell'argomento andrebbe inserito anche il path
-        self.tree = ET.parse('./assets/class_diagram_3.xml') # per prova
+        #self.tree = ET.parse('./assets/class_diagram_3.xml') # per prova
+        self.tree = ET.parse('./assets/class_diagram_3.xml')
         self.root = self.tree.getroot()
         self.background = self.make_background()
         self.shapes = self.make_shapes()
@@ -57,86 +63,45 @@ class Parser:
         return self.bg
     
     # shapes:
+    def parse_outline(self, line_tag: ET.Element) -> Tuple[str, float]:
+        self.outline_color = line_tag.attrib[XA.COLOR]
+        self.outline_weight = line_tag.attrib[XA.WEIGHT]
+        return self.outline_color, self.outline_weight
+
+
 
     def make_shapes(self) -> List[Shape]:
         self.shape_list = []
-        for index, element in enumerate(self.root[2][0][0]):
-            
-            self.shape_list.append(Shape(element.attrib[XA.NAME], element.attrib[XA.MODEL], float(element.attrib[XA.X]), float(element.attrib[XA.Y]),
-                element.attrib[XA.BACKGROUND], float(element.attrib[XA.WIDTH]), float(element.attrib[XA.HEIGHT])))
+        if self.root[2][0].find(XT.SHAPES) != None:
+            for index, element in enumerate(self.root[2][0].find(XT.SHAPES)):
+                outline = self.parse_outline(element.find(XT.LINE))
+                self.shape_list.append(Shape(element.attrib[XA.NAME], element.attrib[XA.MODEL], float(element.attrib[XA.X]), float(element.attrib[XA.Y]),
+                    element.attrib[XA.BACKGROUND], float(element.attrib[XA.WIDTH]), float(element.attrib[XA.HEIGHT]), element.attrib[XA.PRIMITIVESHAPETYPE], outline[0], int(float(outline[1]))))
 
-            model = element.attrib[XA.MODEL]
-            # nel tag model (root[1]), scorre tutti gli elementi finché non trova quello
-            # corrispondente alla shape appena istanziata.
-            for class_instance in self.root[1]:
-                if class_instance.attrib[XA.ID] == model:
-                    # Trovata, scorre tutte le sottoclassi dell'elemento fino a trovare la sottoclasse 'Stereotypes'
-                    for sub_class in class_instance:
-                        if sub_class.tag == XT.STEREOTYPES:
-                            self.shape_list[index].match_stereotypes(sub_class)
-                        if sub_class.tag == XT.MODELCHILDREN:
-                            self.shape_list[index].match_attributes_operations(sub_class)
-                            print('ciao')
+                model = element.attrib[XA.MODEL]
+                # nel tag 'Model' (root[1]), scorre tutti gli elementi finché non trova quello
+                # corrispondente alla shape appena istanziata.
+                for class_instance in self.root[1]:
+                    if class_instance.attrib[XA.ID] == model:
+                        # Trovata, scorre tutte le sottoclassi dell'elemento fino a trovare la sottoclasse 'Stereotypes'
+                        for sub_class in class_instance:
+                            if sub_class.tag == XT.STEREOTYPES:
+                                self.shape_list[index].match_stereotypes(sub_class)
+                            if sub_class.tag == XT.MODELCHILDREN:
+                                self.shape_list[index].match_attributes_operations(sub_class)
         return self.shape_list
 
 
 
         # connectors:
     def make_connectors(self) -> List[Connector]:
-        self.connector_list = []   
-        for element in self.root[2][0][1]:
-            #print(element.tag)
-            for index, line in enumerate(element):
-                if line.tag == XT.POINTS:
-                    line_coordinates = []
-                    for n, _ in enumerate(line):
-                        line_coordinates.append((float(element[index][n].attrib['X']), float(element[index][n].attrib['Y'])))
-                    self.connector_list.append(Connector(element.tag, line_coordinates, element.attrib['Background']))
-                    
-                        
-                    #self.connector_list.append(Connector(element.tag,float(element[index][0].attrib['X']),float(element[index][0].attrib['Y']),
-                    #    float(element[index][1].attrib['X']),float(element[index][1].attrib['Y']), element.attrib['Background']))
-                    #print("point in posizione " + str(index) + " trovato " + point.tag)
+        self.connector_list = []
+        if self.root[2][0].find(XT.CONNECTORS) != None:
+            for element in self.root[2][0].find(XT.CONNECTORS):
+                for index, line in enumerate(element):
+                    if line.tag == XT.POINTS:
+                        line_coordinates = []
+                        for n, _ in enumerate(line):
+                            line_coordinates.append((float(element[index][n].attrib[XA.X]), float(element[index][n].attrib[XA.Y])))
+                        self.connector_list.append(Connector(element.tag, line_coordinates, element.attrib[XA.BACKGROUND]))
         return self.connector_list
-
-
-
-
-    #def make_shapes(self):
-    #    for shape in self.root[2][0][0].findall(XT.CLASS):
-    #        self.name = shape.attrib[XA.NAME]
-    #        self.model = shape.attrib[XA.MODEL]
-    #        self.x = shape.attrib[XA.X]
-    #        self.y = shape.attrib[XA.Y]
-    #        self.bgcolor = shape.attrib[XA.BACKGROUND]
-    #        self.width = shape.attrib[XA.WIDTH]
-    #        self.height = shape.attrib[XA.HEIGHT]
-    #        for shape_data in self.root[1]:
-
-
-
-    #def make_connectors(self):
-        
-                        
-
-
-
-
-    
-
-    #def make_diagram(self, bg: Background) -> Diagram:
-    #    diagram = Diagram(bg,)
-     #   return diagram
-
-
-#test
-#CiaoAntonella
-
-
-
-
-    
-
-
-
-

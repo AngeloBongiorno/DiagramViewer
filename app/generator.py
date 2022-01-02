@@ -11,10 +11,12 @@ class Generator:
         pass
 
     def draw_diagram(self):
-        bg = self.draw_background(self.diagram.background)
-        connectors_step = self.draw_connectors(bg, self.diagram.connectors)
-        shapes_step = self.draw_shapes(connectors_step, self.diagram.shapes)
-        shapes_step.show()
+        img = self.draw_background(self.diagram.background)
+        if len(self.diagram.connectors) != 0:
+            img = self.draw_connectors(img, self.diagram.connectors)
+        if len(self.diagram.shapes) != 0:
+            img = self.draw_shapes(img, self.diagram.shapes)
+        img.show()
 
     # funzione sfondo
     def draw_background(self, bg_info: Background) -> Image:
@@ -60,7 +62,14 @@ class Generator:
     def draw_shapes(self, base_img: Image, shapes: List[Shape]) -> Image:
         img = ImageDraw.Draw(base_img)
         for shape in shapes:
-            img.rectangle([(shape.x, shape.y), (shape.x+shape.width, shape.y+shape.height)], fill = shape.bgcolor)
+            # aggiungere altre shapes (triangolo, ottagono, esagono, trapezio, rombo)
+            match shape.primitive_shape_type:
+                case '0':   # disegna rettangolo
+                    img.rectangle([(shape.x, shape.y), (shape.x+shape.width, shape.y+shape.height)], fill = shape.bgcolor, outline = shape.outline_color, width = shape.outline_weight)
+                case '2':   # disegna rettangolo arrotondato
+                    img.rounded_rectangle([(shape.x, shape.y), (shape.x+shape.width, shape.y+shape.height)], radius = 4, fill = shape.bgcolor, outline = shape.outline_color, width = shape.outline_weight)
+                case '3':   # disegna ellisse
+                    img.ellipse([(shape.x, shape.y), (shape.x+shape.width, shape.y+shape.height)], fill = shape.bgcolor, outline = shape.outline_color, width = shape.outline_weight)
         return base_img
 
 # funzione linea association

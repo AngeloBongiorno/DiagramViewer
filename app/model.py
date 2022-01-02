@@ -16,7 +16,7 @@ class Background:
 
 class Shape:
 
-    def __init__(self, name: str, model: str, x: int, y: int, bgcolor: str, width: int, height: int) -> None:
+    def __init__(self, name: str, model: str, x: int, y: int, bgcolor: str, width: int, height: int, primitive_shape_type: int, outline_color: str, outline_weight: float) -> None:
         self.name = name
         self.model = model
         self.x = x
@@ -24,6 +24,9 @@ class Shape:
         self.bgcolor = bgcolor
         self.width = width
         self.height = height
+        self.primitive_shape_type = primitive_shape_type
+        self.outline_color = outline_color
+        self.outline_weight = outline_weight
         self.operations = []
         self.attributes = []
         self.stereotypes = []
