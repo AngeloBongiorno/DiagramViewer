@@ -1,7 +1,7 @@
 from typing import Any, List
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 from model import Connector, Shape
-
+import re
 from model import Background, Diagram
 
 class Generator:
@@ -24,10 +24,6 @@ class Generator:
         bg = Image.new('RGBA', size, bg_info.background_color)
         #bg_info.background_color
         return bg
-
-        # v test
-        bg.show()
-        # ^ test
     
     def draw_connectors(self, base_img: Image, connectors: List[Connector]) -> Image:
         img = ImageDraw.Draw(base_img)
@@ -59,6 +55,12 @@ class Generator:
                     img.line([(coordinates[0], coordinates[1]),
                         (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill='red', width = 0)
 
+    # da implementare
+    #def rgba_2_rgb(self, rgba_string: str) -> str:
+    #    pattern = re.compile('^(rgba)')
+    #    if pattern.search(rgba_string):
+    #        rgb_string = re.sub(   , ')', rgba_string)
+
     def draw_shapes(self, base_img: Image, shapes: List[Shape]) -> Image:
         img = ImageDraw.Draw(base_img)
         for shape in shapes:
@@ -70,10 +72,10 @@ class Generator:
                     img.rounded_rectangle([(shape.x, shape.y), (shape.x+shape.width, shape.y+shape.height)], radius = 4, fill = shape.bgcolor, outline = shape.outline_color, width = shape.outline_weight)
                 case '3':   # disegna ellisse
                     img.ellipse([(shape.x, shape.y), (shape.x+shape.width, shape.y+shape.height)], fill = shape.bgcolor, outline = shape.outline_color, width = shape.outline_weight)
+            if shape.name != '':
+                font = ImageFont.truetype("./assets/fonts/arial.ttf",  shape.font_size)
+                w, h = img.textsize(shape.name)
+                img.text([shape.x+ (shape.width-w)/2, shape.y], shape.name, fill=shape.text_color, font=font)
+                #self.rgba_2_rgb(shape.outline_color)
+                img.line([shape.x, shape.y+h, shape.x+shape.width, shape.y+h], fill = shape.outline_color )           
         return base_img
-
-# funzione linea association
-
-# funzione linea generalization
-
-# funzione quadrato

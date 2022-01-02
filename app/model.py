@@ -16,7 +16,9 @@ class Background:
 
 class Shape:
 
-    def __init__(self, name: str, model: str, x: int, y: int, bgcolor: str, width: int, height: int, primitive_shape_type: int, outline_color: str, outline_weight: float) -> None:
+    def __init__(self, name: str, model: str, x: int, y: int, bgcolor: str, width: int, height: int,
+        primitive_shape_type: int, outline_color: str, outline_weight: float, element_font_name: str, font_size: int, text_color: str) -> None:
+
         self.name = name
         self.model = model
         self.x = x
@@ -27,17 +29,21 @@ class Shape:
         self.primitive_shape_type = primitive_shape_type
         self.outline_color = outline_color
         self.outline_weight = outline_weight
+        self.element_font_name = element_font_name
+        self.font_size = font_size
+        self.text_color = text_color
         self.operations = []
         self.attributes = []
         self.stereotypes = []
 
     # serve ad aggiungere alla shape eventuale elenco di stereotypes che implementa, questi sono necessari
     # perché mostrati nella rappresentazione grafica del diagramma
-    # potrebbe non servire
     def match_stereotypes(self, stypes):
         for stereotype in stypes:
             self.stereotypes.append(stereotype.attrib['Name'])
 
+    # serve ad aggiungere alla shape eventuale elenco di attributes e operations che implementa, questi sono necessari
+    # perché mostrati nella rappresentazione grafica del diagramma
     def match_attributes_operations(self, model_children):
         for model_child in model_children:
             if model_child.tag == 'Attribute':
@@ -52,10 +58,6 @@ class Connector:
     def __init__(self, tag: str, coordinates: List[Tuple], bgcolor: str) -> None:
         self.tag = tag
         self.coordinates = coordinates
-        #self.startx = startx
-        #self.starty = starty
-        #self.endx = endx
-        #self.endy = endy
         self.bgcolor = bgcolor
 
 class Diagram:

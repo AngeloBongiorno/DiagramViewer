@@ -16,6 +16,7 @@ class XT:
     LINE = 'Line'
     SHAPES = 'Shapes'
     CONNECTORS = 'Connectors'
+    ELEMENTFONT = 'ElementFont'
 
 class XA:
     """XML attributes namespace."""
@@ -31,6 +32,7 @@ class XA:
     COLOR = 'Color'
     WEIGHT = 'Weight'
     PRIMITIVESHAPETYPE = 'PrimitiveShapeType'
+    SIZE = 'Size'
 
 class Parser:
 
@@ -42,7 +44,7 @@ class Parser:
 
     def parse(self) -> Diagram: # nell'argomento andrebbe inserito anche il path
         #self.tree = ET.parse('./assets/class_diagram_3.xml') # per prova
-        self.tree = ET.parse('./assets/class_diagram_3.xml')
+        self.tree = ET.parse('./assets/varie_shapes_v3.xml')
         self.root = self.tree.getroot()
         self.background = self.make_background()
         self.shapes = self.make_shapes()
@@ -68,15 +70,23 @@ class Parser:
         self.outline_weight = line_tag.attrib[XA.WEIGHT]
         return self.outline_color, self.outline_weight
 
+    def parse_element_font(self, element_font_tag: ET.Element) -> Tuple[str, int, str]:
+        self.element_font_name = element_font_tag.attrib[XA.NAME]
+        self.element_font_size = element_font_tag.attrib[XA.SIZE]
+        self.element_font_color = element_font_tag.attrib[XA.COLOR]
+        return self.element_font_name, self.element_font_size, self.element_font_color
+
 
 
     def make_shapes(self) -> List[Shape]:
         self.shape_list = []
         if self.root[2][0].find(XT.SHAPES) != None:
             for index, element in enumerate(self.root[2][0].find(XT.SHAPES)):
-                outline = self.parse_outline(element.find(XT.LINE))
+                _outline = self.parse_outline(element.find(XT.LINE))
+                _element_font = self.parse_element_font(element.find(XT.ELEMENTFONT))
                 self.shape_list.append(Shape(element.attrib[XA.NAME], element.attrib[XA.MODEL], float(element.attrib[XA.X]), float(element.attrib[XA.Y]),
-                    element.attrib[XA.BACKGROUND], float(element.attrib[XA.WIDTH]), float(element.attrib[XA.HEIGHT]), element.attrib[XA.PRIMITIVESHAPETYPE], outline[0], int(float(outline[1]))))
+                    element.attrib[XA.BACKGROUND], float(element.attrib[XA.WIDTH]), float(element.attrib[XA.HEIGHT]),
+                    element.attrib[XA.PRIMITIVESHAPETYPE], _outline[0], int(float(_outline[1])), _element_font[0], int(_element_font[1]), _element_font[2]))
 
                 model = element.attrib[XA.MODEL]
                 # nel tag 'Model' (root[1]), scorre tutti gli elementi finché non trova quello
