@@ -44,7 +44,7 @@ class Parser:
 
     def parse(self) -> Diagram: # nell'argomento andrebbe inserito anche il path
         #self.tree = ET.parse('./assets/class_diagram_3.xml') # per prova
-        self.tree = ET.parse('./assets/varie_shapes_v3.xml')
+        self.tree = ET.parse('./assets/class_diagram_3.xml')
         self.root = self.tree.getroot()
         self.background = self.make_background()
         self.shapes = self.make_shapes()
