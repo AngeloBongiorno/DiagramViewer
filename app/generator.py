@@ -13,10 +13,10 @@ class Generator:
 
     def draw_diagram(self):
         img = self.draw_background(self.diagram.background)
-        if len(self.diagram.connectors) != 0:
-            img = self.draw_connectors(img, self.diagram.connectors)
         if len(self.diagram.shapes) != 0:
             img = self.draw_shapes(img, self.diagram.shapes)
+        if len(self.diagram.connectors) != 0:
+            img = self.draw_connectors(img, self.diagram.connectors)
         img.show()
 
     # funzione sfondo
@@ -40,74 +40,70 @@ class Generator:
             #        self.draw_generalization(connector, img)
             #    case 'Composition':
             #        pass
-            #    case 'Realization':
-            #        self.draw_realization(connector, img)
-            #    case 'Dependency':
-            #        self.draw_dependency(connector, img)
-            #    case 'Association':
-            #        self.draw_association(connector, img)
+                case 'Realization':
+                    self.draw_realization(connector, img)
+                case 'Dependency':
+                    self.draw_dependency(connector, img)
+                case 'Association':
+                    self.draw_association(connector, img)
                 case _:
                     self.draw_association(connector, img)
              
             #for index, current_coordinates in enumerate(connector.coordinates):
             #    if index + 1 < len(connector.coordinates):
+
+            #        self.dashed_line(img, current_coordinates[0], current_coordinates[1],
+            #        connector.coordinates[index+1][0], connector.coordinates[index+1][1])
+            #   oppure
             #        img.line([(current_coordinates[0], current_coordinates[1]),
             #            (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill='red', width = 0)
-
-
-                    # da integrare
-                    #cur_x = 0
-                    #cur_y = 0
-                    #image_width = 600
-                    #for x in range(cur_x, image_width, 4):
-                     #   draw.line([(x, cur_y), (x + 2, cur_y)], fill='red', width = 0)
   
         return base_img
 
-    def draw_realization(self, connector: Connector, img: Image) -> Image:
+    def draw_realization(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
                 if index + 1 < len(connector.coordinates):
                     self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1])
                     #aggiungere freccia blu alla fine
 
-    def draw_dependency(self, connector: Connector, img: Image) -> Image:
+    def draw_dependency(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
                 if index + 1 < len(connector.coordinates):
                     self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1])
                     #aggiungere freccia non chiusa
 
 
-    def draw_association(self, connector: Connector, img: Image) -> Image:
+    def draw_association(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
                 if index + 1 < len(connector.coordinates):
                     img.line([(coordinates[0], coordinates[1]),
                         (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill='red', width = 0)
 
-    def draw_generalization(self, connector: Connector, img: Image) -> Image:
+    def draw_generalization(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
                 if index + 1 < len(connector.coordinates):
                     img.line([(coordinates[0], coordinates[1]),
                         (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill='red', width = 0)
 
 
-    def dashed_line(self, base_img: ImageDraw, x0, y0, x1, y1, dashlen=2, ratio=2): 
+    def dashed_line(self, base_img: ImageDraw, x0, y0, x1, y1, dashlen=5, ratio=2): 
         dx=x1-x0 # delta x
         dy=y1-y0 # delta y
-        # check whether we can avoid sqrt
+        # calcolo sunghezza segmento
         if dy==0:
-            len=dx
+            len=abs(dx)
         elif dx==0:
-            len=dy
+            len=abs(dy)
         else:
-            len=math.sqrt(dx*dx+dy*dy) # length of line
+            len=math.sqrt(dx*dx+dy*dy)
         xa=dx/len # x add for 1px line length
         ya=dy/len # y add for 1px line length
-        step=dashlen*ratio # step to the next dash
+        step=dashlen*ratio # lunghezza spazio tra trattini
         a0=0
         while a0<len:
             a1=a0+dashlen
-            #if a1>len:
-            #    a1=len
+            if a1>len:
+                a1=len
             base_img.line((x0+xa*a0, y0+ya*a0, x0+xa*a1, y0+ya*a1), fill = 'black', width = 1)
             a0+=step
 
