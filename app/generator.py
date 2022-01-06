@@ -1,7 +1,9 @@
-from typing import Any, List
+from typing import Any, List, Tuple
 from PIL import Image, ImageDraw, ImageFont
 from model import Connector, Shape
 import re
+import random
+import numpy as np
 import math
 from model import Background, Diagram
 
@@ -17,6 +19,7 @@ class Generator:
             img = self.draw_shapes(img, self.diagram.shapes)
         if len(self.diagram.connectors) != 0:
             img = self.draw_connectors(img, self.diagram.connectors)
+        
         img.show()
 
     # funzione sfondo
@@ -62,9 +65,24 @@ class Generator:
 
     def draw_realization(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
+            if index!= 0:
                 if index + 1 < len(connector.coordinates):
                     self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1])
+            else:
+                if index + 1 < len(connector.coordinates):
+                    self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1])
+                    angle = self.angle_between((coordinates[0],coordinates[1]), (connector.coordinates[index+1][0],connector.coordinates[index+1][1]))
+                    img.regular_polygon((coordinates[0], coordinates[1], 8), 3, rotation = angle, fill='red', outline='Black')
                     #aggiungere freccia blu alla fine
+
+
+    # TODO implementare correttamente
+
+    def angle_between(self, a: Tuple, b: Tuple):
+        ang1 = np.arctan2(a[1],a[0])
+        ang2 = np.arctan2(b[1], b[0])
+        return np.rad2deg(ang1 - ang2)
+
 
     def draw_dependency(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
