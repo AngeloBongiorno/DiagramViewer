@@ -133,6 +133,7 @@ class Generator:
 
     def draw_shapes(self, base_img: Image, shapes: List[Shape]) -> Image:
         img = ImageDraw.Draw(base_img)
+
         for shape in shapes:
             # aggiungere altre shapes (triangolo, ottagono, esagono, trapezio, rombo)
             match shape.primitive_shape_type:
@@ -142,14 +143,34 @@ class Generator:
                     img.rounded_rectangle([(shape.x, shape.y), (shape.x+shape.width, shape.y+shape.height)], radius = 4, fill = shape.bgcolor, outline = shape.outline_color, width = shape.outline_weight)
                 case '3':   # disegna ellisse
                     img.ellipse([(shape.x, shape.y), (shape.x+shape.width, shape.y+shape.height)], fill = shape.bgcolor, outline = shape.outline_color, width = shape.outline_weight)
+                case _:
+                    img.rectangle([(shape.x, shape.y), (shape.x+shape.width, shape.y+shape.height)], fill = shape.bgcolor, outline = shape.outline_color, width = shape.outline_weight)
+
             font = ImageFont.truetype("./assets/fonts/arial.ttf",  shape.font_size)
+
+            w, h = img.textsize(shape.name)
+            img.text([shape.x+ (shape.width-w)/2, shape.y], shape.name, fill=shape.text_color, font=font)
+            #self.rgba_2_rgb(shape.outline_color)
+            img.line([shape.x, shape.y+h, shape.x+shape.width, shape.y+h], fill = shape.outline_color)
+
             if shape.stereotypes:
                 for stereotype in shape.stereotypes:
                     w, h = img.textsize(stereotype)
                     img.text([shape.x+ (shape.width-w)/2, shape.y-h], "<<"+stereotype+">>", fill=shape.text_color, font=font)
-            if shape.name != '':
-                w, h = img.textsize(shape.name)
-                img.text([shape.x+ (shape.width-w)/2, shape.y], shape.name, fill=shape.text_color, font=font)
-                #self.rgba_2_rgb(shape.outline_color)
-                img.line([shape.x, shape.y+h, shape.x+shape.width, shape.y+h], fill = shape.outline_color )           
+
+            a=0
+
+            if shape.attributes:
+                for attribute in shape.attributes:
+                    w, h = img.textsize(attribute)
+                    img.text([shape.x, shape.y+h+a], attribute, fill=shape.text_color, font=font, anchor='lt')
+                    a+=h+1
+                img.line([shape.x, shape.y+h+a, shape.x+shape.width, shape.y+h+a], fill = shape.outline_color)
+
+            if shape.operations:
+                for operation in shape.operations:
+                    w, h = img.textsize(operation)
+                    img.text([shape.x, shape.y+h+a], operation+'()', fill=shape.text_color, font=font, anchor='lt')
+                    a+=h+1
+
         return base_img
