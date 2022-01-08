@@ -14,6 +14,7 @@ class Generator:
         pass
 
     def draw_diagram(self):
+        print((self.angle_between((0,0),(30,-20))))
         img = self.draw_background(self.diagram.background)
         if len(self.diagram.shapes) != 0:
             img = self.draw_shapes(img, self.diagram.shapes)
@@ -72,16 +73,14 @@ class Generator:
                 if index + 1 < len(connector.coordinates):
                     self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1])
                     angle = self.angle_between((coordinates[0],coordinates[1]), (connector.coordinates[index+1][0],connector.coordinates[index+1][1]))
-                    img.regular_polygon((coordinates[0], coordinates[1], 8), 3, rotation = angle, fill='red', outline='Black')
+                    img.regular_polygon((coordinates[0], coordinates[1], 8), 3, rotation=angle, fill='red', outline='Black')
                     #aggiungere freccia blu alla fine
 
 
     # TODO implementare correttamente
 
     def angle_between(self, a: Tuple, b: Tuple):
-        ang1 = np.arctan2(a[1],a[0])
-        ang2 = np.arctan2(b[1], b[0])
-        return np.rad2deg(ang1 - ang2)
+        return np.rad2deg(np.arctan2(b[1]-a[1],b[0]-a[0]))
 
 
     def draw_dependency(self, connector: Connector, img: ImageDraw):
@@ -143,8 +142,12 @@ class Generator:
                     img.rounded_rectangle([(shape.x, shape.y), (shape.x+shape.width, shape.y+shape.height)], radius = 4, fill = shape.bgcolor, outline = shape.outline_color, width = shape.outline_weight)
                 case '3':   # disegna ellisse
                     img.ellipse([(shape.x, shape.y), (shape.x+shape.width, shape.y+shape.height)], fill = shape.bgcolor, outline = shape.outline_color, width = shape.outline_weight)
+            font = ImageFont.truetype("./assets/fonts/arial.ttf",  shape.font_size)
+            if shape.stereotypes:
+                for stereotype in shape.stereotypes:
+                    w, h = img.textsize(stereotype)
+                    img.text([shape.x+ (shape.width-w)/2, shape.y-h], "<<"+stereotype+">>", fill=shape.text_color, font=font)
             if shape.name != '':
-                font = ImageFont.truetype("./assets/fonts/arial.ttf",  shape.font_size)
                 w, h = img.textsize(shape.name)
                 img.text([shape.x+ (shape.width-w)/2, shape.y], shape.name, fill=shape.text_color, font=font)
                 #self.rgba_2_rgb(shape.outline_color)
