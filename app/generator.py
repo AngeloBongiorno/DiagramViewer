@@ -162,15 +162,15 @@ class Generator:
 
             if shape.attributes:
                 for attribute in shape.attributes:
-                    w, h = img.textsize(attribute)
-                    img.text([shape.x, shape.y+h+a], attribute, fill=shape.text_color, font=font, anchor='lt')
+                    w, h = img.textsize(attribute.name)
+                    img.text([shape.x, shape.y+h+a], attribute.visibility+' '+attribute.name, fill=shape.text_color, font=font, anchor='lt')
                     a+=h+1
                 img.line([shape.x, shape.y+h+a, shape.x+shape.width, shape.y+h+a], fill = shape.outline_color)
 
             if shape.operations:
                 for operation in shape.operations:
-                    w, h = img.textsize(operation)
-                    img.text([shape.x, shape.y+h+a], operation+'()', fill=shape.text_color, font=font, anchor='lt')
+                    w, h = img.textsize(operation.name)
+                    img.text([shape.x, shape.y+h+a], operation.visibility+' '+operation.name, fill=shape.text_color, font=font, anchor='lt')
                     a+=h+1
 
         return base_img

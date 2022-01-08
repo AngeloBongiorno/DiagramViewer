@@ -47,11 +47,34 @@ class Shape:
     def match_attributes_operations(self, model_children):
         for model_child in model_children:
             if model_child.tag == 'Attribute':
-                self.attributes.append(model_child.attrib['Name'])
+                attr = Attribute(model_child.attrib['Name'], model_child.attrib['Visibility'])
+                self.attributes.append(attr)
             if model_child.tag == 'Operation':
-                self.operations.append(model_child.attrib['Name'])
+                op = Operation(model_child.attrib['Name'], model_child.attrib['Visibility'])
+                self.operations.append(op)
 
-    
+class Attribute:
+
+    def __init__(self, name: str, visibility: str):
+        self.name = name
+        if visibility == 'public':
+            self.visibility = '+'
+        elif visibility == 'protected':
+            self.visibility = '#'
+        else:
+            self.visibility = '-'
+
+class Operation:
+
+    def __init__(self, name: str, visibility: str):
+        self.name = name + '()'
+        if visibility == 'public':
+            self.visibility = '+'
+        elif visibility == 'protected':
+            self.visibility == '#'
+        else:
+            self.visibility == '-'
+            
 
 class Connector:
 
