@@ -33,11 +33,6 @@ class Generator:
     def draw_connectors(self, base_img: Image, connectors: List[Connector]) -> Image:
         img = ImageDraw.Draw(base_img)
         for connector in connectors:
-            # Connector contiene coordinate e tipo di riga
-            #generalization
-            #composition
-            #realization
-            #dependency
 
             match connector.tag:
             #    case 'Generalization':

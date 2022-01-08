@@ -8,11 +8,7 @@ class Background:
         self.width = width
         self.height = height
         self.background_color = background_color
-        #diagram = Diagram(self.root[2][0].attrib['Width'],
-        #    self.root[2][0].attrib['Height'], self.root[2][0].attrib['DiagramBackground'])
 
-#test
-#bg=Background(100,100,'rgb(255,255,255)')
 
 class Shape:
 
@@ -57,23 +53,33 @@ class Attribute:
 
     def __init__(self, name: str, visibility: str):
         self.name = name
-        if visibility == 'public':
-            self.visibility = '+'
-        elif visibility == 'protected':
-            self.visibility = '#'
-        else:
-            self.visibility = '-'
+        match visibility:
+            case 'package':
+                self.visibility = '~'
+            case 'private':
+                self.visibility = '-'
+            case 'protected':
+                self.visibility = '#'
+            case 'public':
+                self.visibility = '+'
+            case _:
+                self.visibility = '+'
 
 class Operation:
 
     def __init__(self, name: str, visibility: str):
         self.name = name + '()'
-        if visibility == 'public':
-            self.visibility = '+'
-        elif visibility == 'protected':
-            self.visibility == '#'
-        else:
-            self.visibility == '-'
+        match visibility:
+            case 'package':
+                self.visibility = '~'
+            case 'private':
+                self.visibility = '-'
+            case 'protected':
+                self.visibility = '#'
+            case 'public':
+                self.visibility = '+'
+            case _:
+                self.visibility = '+'
             
 
 class Connector:
@@ -89,5 +95,3 @@ class Diagram:
         self.background = background
         self.shapes = shapes
         self.connectors = connectors
-
-
