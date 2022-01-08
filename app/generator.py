@@ -2,7 +2,6 @@ from typing import Any, List, Tuple
 from PIL import Image, ImageDraw, ImageFont
 from model import Connector, Shape
 import re
-import random
 import numpy as np
 import math
 from model import Background, Diagram
@@ -35,8 +34,8 @@ class Generator:
         for connector in connectors:
 
             match connector.tag:
-            #    case 'Generalization':
-            #        self.draw_generalization(connector, img)
+                case 'Generalization':
+                    self.draw_generalization(connector, img)
             #    case 'Composition':
             #        pass
                 case 'Realization':
@@ -61,15 +60,14 @@ class Generator:
 
     def draw_realization(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
-            if index!= 0:
-                if index + 1 < len(connector.coordinates):
-                    self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1])
-            else:
-                if index + 1 < len(connector.coordinates):
-                    self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1])
+            if index + 1 < len(connector.coordinates):
+                if index!= 0:
+                    self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
+                else:
+                    self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
                     angle = self.angle_between((coordinates[0],coordinates[1]), (connector.coordinates[index+1][0],connector.coordinates[index+1][1]))
                     img.regular_polygon((coordinates[0], coordinates[1], 8), 3, rotation=angle, fill='red', outline='Black')
-                    #aggiungere freccia blu alla fine
+                    # ^ questo triangolo è storto perché il metodo angle_between va fixato
 
 
     # TODO implementare correttamente
@@ -81,7 +79,7 @@ class Generator:
     def draw_dependency(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
                 if index + 1 < len(connector.coordinates):
-                    self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1])
+                    self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
                     #aggiungere freccia non chiusa
 
 
@@ -89,16 +87,23 @@ class Generator:
         for index, coordinates in enumerate(connector.coordinates):
                 if index + 1 < len(connector.coordinates):
                     img.line([(coordinates[0], coordinates[1]),
-                        (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill='red', width = 0)
+                        (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
 
     def draw_generalization(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
-                if index + 1 < len(connector.coordinates):
+            if index + 1 < len(connector.coordinates):
+                if index != 0:
                     img.line([(coordinates[0], coordinates[1]),
-                        (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill='red', width = 0)
+                            (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
+                else:
+                    img.line([(coordinates[0], coordinates[1]),
+                        (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
+                    angle = self.angle_between((coordinates[0],coordinates[1]), (connector.coordinates[index+1][0],connector.coordinates[index+1][1]))
+                    img.regular_polygon((coordinates[0], coordinates[1], 8), 3, rotation=angle, fill='white', outline=connector.color)
+                    # ^ questo triangolo è storto perché il metodo angle_between va fixato
 
 
-    def dashed_line(self, base_img: ImageDraw, x0, y0, x1, y1, dashlen=5, ratio=2): 
+    def dashed_line(self, base_img: ImageDraw, x0, y0, x1, y1, color='black', dashlen=5, ratio=2): 
         dx=x1-x0 # delta x
         dy=y1-y0 # delta y
         # calcolo sunghezza segmento
@@ -116,7 +121,7 @@ class Generator:
             a1=a0+dashlen
             if a1>len:
                 a1=len
-            base_img.line((x0+xa*a0, y0+ya*a0, x0+xa*a1, y0+ya*a1), fill = 'black', width = 1)
+            base_img.line((x0+xa*a0, y0+ya*a0, x0+xa*a1, y0+ya*a1), fill = color, width = 1)
             a0+=step
 
 
