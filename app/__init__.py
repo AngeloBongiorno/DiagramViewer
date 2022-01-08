@@ -1,7 +1,5 @@
-from PIL import Image, ImageDraw
 from generator import Generator
 from parser import Parser
-import math
 
 
 

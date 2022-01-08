@@ -84,10 +84,11 @@ class Operation:
 
 class Connector:
 
-    def __init__(self, tag: str, coordinates: List[Tuple], bgcolor: str) -> None:
+    def __init__(self, tag: str, coordinates: List[Tuple], color: str, weight: float) -> None:
         self.tag = tag
         self.coordinates = coordinates
-        self.bgcolor = bgcolor
+        self.color = color
+        self.weight = weight
 
 class Diagram:
 

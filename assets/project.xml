@@ -191,7 +191,7 @@
 				</Generalization>
 				<Generalization Background="rgb(255, 255, 255)" ConnectorLabelOrientation="4" ConnectorLineJumps="4" ConnectorStyle="Follow Diagram" CreatorDiagramType="ClassDiagram" Foreground="rgb(0, 0, 0)" From="Tql6I76GAqBwAQW1" FromConnectType="0" FromPinType="1" FromShapeXDiff="0" FromShapeYDiff="0" Height="226" Id="54iGI76GAqBwAQYc" MetaModelElement="e4iGI76GAqBwAQYb" Model="e4iGI76GAqBwAQYb" ModelElementNameAlignment="9" PaintThroughLabel="2" RequestRebuild="false" RequestRebuildFromEnd="false" RequestRebuildToEnd="false" RequestResetCaption="false" RequestResetCaptionFitWidth="false" RequestResetCaptionSize="false" Selectable="true" ShowConnectorName="2" To="aK36I76GAqBwAQXl" ToConnectType="0" ToPinType="1" ToShapeXDiff="0" ToShapeYDiff="0" UseFromShapeCenter="true" UseToShapeCenter="true" Width="100" X="263" Y="139" ZOrder="14">
 					<ElementFont Color="rgb(0, 0, 0)" Name="Dialog" Size="11" Style="0"/>
-					<Line Cap="0" Color="rgb(0, 0, 0)" Transparency="0" Weight="1.0">
+					<Line Cap="0" Color="rgb(100, 5, 30)" Transparency="0" Weight="1.0">
 						<Stroke/>
 					</Line>
 					<Caption Height="0" InternalHeight="-2147483648" InternalWidth="-2147483648" Side="None" Visible="true" Width="20" X="312" Y="248"/>
@@ -201,8 +201,8 @@
 					</Points>
 				</Generalization>
 				<Generalization Background="rgb(255, 255, 255)" ConnectorLabelOrientation="4" ConnectorLineJumps="4" ConnectorStyle="Follow Diagram" CreatorDiagramType="ClassDiagram" Foreground="rgb(0, 0, 0)" From="Tql6I76GAqBwAQW1" FromConnectType="0" FromPinType="1" FromShapeXDiff="0" FromShapeYDiff="0" Height="100" Id="amSGI76GAqBwAQYo" MetaModelElement="8mSGI76GAqBwAQYn" Model="8mSGI76GAqBwAQYn" ModelElementNameAlignment="9" PaintThroughLabel="2" RequestRebuild="false" RequestRebuildFromEnd="false" RequestRebuildToEnd="false" RequestResetCaption="false" RequestResetCaptionFitWidth="false" RequestResetCaptionSize="false" Selectable="true" ShowConnectorName="2" To="hQv6I76GAqBwAQXw" ToConnectType="0" ToPinType="1" ToShapeXDiff="0" ToShapeYDiff="0" UseFromShapeCenter="true" UseToShapeCenter="true" Width="214" X="264" Y="119" ZOrder="16">
-					<ElementFont Color="rgb(0, 0, 0)" Name="Dialog" Size="11" Style="0"/>
-					<Line Cap="0" Color="rgb(0, 0, 0)" Transparency="0" Weight="1.0">
+					<ElementFont Color="rgb(100, 5, 30)" Name="Dialog" Size="11" Style="0"/>
+					<Line Cap="0" Color="rgb(100, 50, 0)" Transparency="0" Weight="1.0">
 						<Stroke/>
 					</Line>
 					<Caption Height="0" InternalHeight="-2147483648" InternalWidth="-2147483648" Side="None" Visible="true" Width="20" X="361" Y="168"/>

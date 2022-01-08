@@ -7,32 +7,33 @@ from model import Connector, Shape, Diagram
 
 class XT:
     """XML tags namespace."""
-    CLASS = 'Class'
-    POINTS = 'Points'
-    STEREOTYPES = 'Stereotypes'
-    MODELCHILDREN = 'ModelChildren'
     ATTRIBUTE = 'Attribute'
-    OPERATION = 'Operation'
-    LINE = 'Line'
-    SHAPES = 'Shapes'
+    CLASS = 'Class'
     CONNECTORS = 'Connectors'
     ELEMENTFONT = 'ElementFont'
+    LINE = 'Line'
+    MODELCHILDREN = 'ModelChildren'
+    OPERATION = 'Operation'
+    POINTS = 'Points'
+    SHAPES = 'Shapes'
+    STEREOTYPES = 'Stereotypes'
 
 class XA:
     """XML attributes namespace."""
-    NAME = 'Name'
-    MODEL = 'Model'
-    X = 'X'
-    Y = 'Y'
-    WIDTH = 'Width'
-    HEIGHT = 'Height'
-    DIAGRAMBACKGROUND = 'DiagramBackground'
     BACKGROUND = 'Background'
-    ID = 'Id'
     COLOR = 'Color'
-    WEIGHT = 'Weight'
+    DIAGRAMBACKGROUND = 'DiagramBackground'
+    HEIGHT = 'Height'
+    ID = 'Id'
+    MODEL = 'Model'
+    NAME = 'Name'
     PRIMITIVESHAPETYPE = 'PrimitiveShapeType'
     SIZE = 'Size'
+    WEIGHT = 'Weight'
+    WIDTH = 'Width'
+    X = 'X'
+    Y = 'Y'
+    
 
 class Parser:
 
@@ -43,7 +44,6 @@ class Parser:
         pass
 
     def parse(self) -> Diagram: # nell'argomento andrebbe inserito anche il path
-        #self.tree = ET.parse('./assets/class_diagram_3.xml') # per prova
         self.tree = ET.parse('./assets/class_diagram_3.xml')
         self.root = self.tree.getroot()
         self.background = self.make_background()
@@ -65,10 +65,10 @@ class Parser:
         return self.bg
     
     # shapes:
-    def parse_outline(self, line_tag: ET.Element) -> Tuple[str, float]:
-        self.outline_color = line_tag.attrib[XA.COLOR]
-        self.outline_weight = line_tag.attrib[XA.WEIGHT]
-        return self.outline_color, self.outline_weight
+    def parse_line(self, line_tag: ET.Element) -> Tuple[str, float]:
+        self.line_color = line_tag.attrib[XA.COLOR]
+        self.line_weight = line_tag.attrib[XA.WEIGHT]
+        return self.line_color, self.line_weight
 
     def parse_element_font(self, element_font_tag: ET.Element) -> Tuple[str, int, str]:
         self.element_font_name = element_font_tag.attrib[XA.NAME]
@@ -82,7 +82,7 @@ class Parser:
         self.shape_list = []
         if self.root[2][0].find(XT.SHAPES) != None:
             for index, element in enumerate(self.root[2][0].find(XT.SHAPES)):
-                _outline = self.parse_outline(element.find(XT.LINE))
+                _outline = self.parse_line(element.find(XT.LINE))
                 _element_font = self.parse_element_font(element.find(XT.ELEMENTFONT))
                 self.shape_list.append(Shape(element.attrib[XA.NAME], element.attrib[XA.MODEL], float(element.attrib[XA.X]), float(element.attrib[XA.Y]),
                     element.attrib[XA.BACKGROUND], float(element.attrib[XA.WIDTH]), float(element.attrib[XA.HEIGHT]),
@@ -106,12 +106,14 @@ class Parser:
         # connectors:
     def make_connectors(self) -> List[Connector]:
         self.connector_list = []
-        if self.root[2][0].find(XT.CONNECTORS) != None:
+        if self.root[2][0].find(XT.CONNECTORS):
             for element in self.root[2][0].find(XT.CONNECTORS):
-                for index, line in enumerate(element):
-                    if line.tag == XT.POINTS:
-                        line_coordinates = []
-                        for n, _ in enumerate(line):
-                            line_coordinates.append((float(element[index][n].attrib[XA.X]), float(element[index][n].attrib[XA.Y])))
-                        self.connector_list.append(Connector(element.tag, line_coordinates, element.attrib[XA.BACKGROUND]))
+                for index, connector_tag in enumerate(element):
+                    if connector_tag.tag == XT.LINE:
+                        self._color_and_weight = self.parse_line(connector_tag)
+                    if connector_tag.tag == XT.POINTS:
+                        self._connector_coordinates = []
+                        for n, _ in enumerate(connector_tag):
+                            self._connector_coordinates.append((float(element[index][n].attrib[XA.X]), float(element[index][n].attrib[XA.Y])))
+                self.connector_list.append(Connector(element.tag, self._connector_coordinates, self._color_and_weight[0], int(float(self._color_and_weight[1]))))
         return self.connector_list
