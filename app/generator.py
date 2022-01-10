@@ -13,13 +13,12 @@ class Generator:
         pass
 
     def draw_diagram(self):
-        print((self.angle_between((0,0),(30,-20))))
+        
         img = self.draw_background(self.diagram.background)
         if len(self.diagram.shapes) != 0:
             img = self.draw_shapes(img, self.diagram.shapes)
         if len(self.diagram.connectors) != 0:
             img = self.draw_connectors(img, self.diagram.connectors)
-        
         img.show()
 
     # funzione sfondo
@@ -36,14 +35,16 @@ class Generator:
             match connector.tag:
                 case 'Generalization':
                     self.draw_generalization(connector, img)
-            #    case 'Composition':
-            #        pass
+                case 'Composition':
+                    self.draw_composition(connector, img)
                 case 'Realization':
                     self.draw_realization(connector, img)
                 case 'Dependency':
                     self.draw_dependency(connector, img)
                 case 'Association':
                     self.draw_association(connector, img)
+                case 'Aggregation':
+                    self.draw_aggregation(connector, img)
                 case _:
                     self.draw_association(connector, img)
              
@@ -65,15 +66,17 @@ class Generator:
                     self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
                 else:
                     self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
-                    angle = self.angle_between((coordinates[0],coordinates[1]), (connector.coordinates[index+1][0],connector.coordinates[index+1][1]))
-                    img.regular_polygon((coordinates[0], coordinates[1], 8), 3, rotation=angle, fill='red', outline='Black')
+                    #angle = self.angle_between((coordinates[0],coordinates[1]), (connector.coordinates[index+1][0],connector.coordinates[index+1][1]))
+
+                    self.draw_triangle(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'red', connector.color)
+                    #img.regular_polygon((coordinates[0], coordinates[1], 8), 3, rotation=angle, fill='red', outline='Black')
                     # ^ questo triangolo è storto perché il metodo angle_between va fixato
 
 
     # TODO implementare correttamente
 
     def angle_between(self, a: Tuple, b: Tuple):
-        return np.rad2deg(np.arctan2(b[1]-a[1],b[0]-a[0]))
+        return np.rad2deg(np.arctan2(abs(b[1]-a[1]),b[0]-a[0]))
 
 
     def draw_dependency(self, connector: Connector, img: ImageDraw):
@@ -82,12 +85,44 @@ class Generator:
                     self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
                     #aggiungere freccia non chiusa
 
+    def draw_composition(self, connector: Connector, img: ImageDraw):
+        for index, coordinates in enumerate(connector.coordinates):
+            if index + 1 < len(connector.coordinates):
+                if index != 0:
+                    img.line([(coordinates[0], coordinates[1]),
+                        (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
+                else:
+                    img.line([(coordinates[0], coordinates[1]),
+                        (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
+                    self.draw_rhombus(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'black', connector.color)
+
 
     def draw_association(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
-                if index + 1 < len(connector.coordinates):
+            if index + 1 < len(connector.coordinates):
+                if index != 0:
                     img.line([(coordinates[0], coordinates[1]),
                         (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
+                else:
+                    img.line([(coordinates[0], coordinates[1]),
+                        (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
+                    if connector.aggregation_kind == 'Shared':
+                        self.draw_rhombus(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'white', connector.color)
+                    elif connector.aggregation_kind == 'Composited':
+                        self.draw_rhombus(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'black', connector.color)
+                    
+                
+
+    def draw_aggregation(self, connector: Connector, img: ImageDraw):
+        for index, coordinates in enumerate(connector.coordinates):
+            if index + 1 < len(connector.coordinates):
+                if index != 0:
+                    img.line([(coordinates[0], coordinates[1]),
+                        (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
+                else:
+                    img.line([(coordinates[0], coordinates[1]),
+                        (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
+                    self.draw_rhombus(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'white', connector.color)
 
     def draw_generalization(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
@@ -98,15 +133,77 @@ class Generator:
                 else:
                     img.line([(coordinates[0], coordinates[1]),
                         (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
-                    angle = self.angle_between((coordinates[0],coordinates[1]), (connector.coordinates[index+1][0],connector.coordinates[index+1][1]))
-                    img.regular_polygon((coordinates[0], coordinates[1], 8), 3, rotation=angle, fill='white', outline=connector.color)
+                    #angle = self.angle_between((coordinates[0],coordinates[1]), (connector.coordinates[index+1][0],connector.coordinates[index+1][1]))
+                    
+                    self.draw_triangle(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'white', connector.color)
+                    #img.regular_polygon((coordinates[0], coordinates[1], 8), 3, rotation=angle, fill='white', outline=connector.color)
                     # ^ questo triangolo è storto perché il metodo angle_between va fixato
+
+    def draw_triangle(self,  img: ImageDraw, ptA: Tuple, ptB: Tuple, color: str, outline: str):
+        #coordinate punti
+        x0, y0 = ptA
+        x1, y1 = ptB
+
+        #coordinate dell'intersezione linea - base del triangolo
+        xb = 0.70*(x1-x0)+x0
+        yb = 0.70*(y1-y0)+y0
+
+        #controlla se la linea è verticale o orizzontale
+        if x0==x1:
+           vtx0 = (xb-5, yb)
+           vtx1 = (xb+5, yb)
+        elif y0==y1:
+           vtx0 = (xb, yb+5)
+           vtx1 = (xb, yb-5)
+        else:
+           alpha = math.atan2(y1-y0,x1-x0) - 90*math.pi/180
+           a = 6*math.cos(alpha)
+           b = 6*math.sin(alpha)
+           vtx0 = (xb+a, yb+b)
+           vtx1 = (xb-a, yb-b)
+
+        img.polygon([vtx0, vtx1, ptB], fill=color, outline=outline)
+
+    def draw_rhombus(self,  img: ImageDraw, ptA: Tuple, ptB: Tuple, color: str, outline: str):
+
+        #coordinate punti inizio ultima linea
+        x0, y0 = ptA
+        #coorinate punta freccia
+        x1, y1 = ptB
+
+        #coordinate dell'intersezione linea - base del triangolo
+        xb = 0.80*(x1-x0)+x0
+        yb = 0.80*(y1-y0)+y0
+
+        #controlla se la linea è verticale o orizzontale
+        if x0==x1:
+           vtx0 = (xb-5, yb)
+           vtx1 = (xb+5, yb)
+        elif y0==y1:
+           vtx0 = (xb, yb+5)
+           vtx1 = (xb, yb-5)
+        else:
+           alpha = math.atan2(y1-y0,x1-x0) - 90*math.pi/180
+           a = 6*math.cos(alpha)
+           b = 6*math.sin(alpha)
+           vtx0 = (xb+a, yb+b)
+           vtx1 = (xb-a, yb-b)
+
+        deltax = xb-x1
+        deltay = yb-y1
+
+        rx = xb + deltax
+        ry = yb + deltay
+        r = (rx, ry)
+
+        img.polygon([vtx0, r, vtx1, ptB], fill=color, outline=outline)
+
 
 
     def dashed_line(self, base_img: ImageDraw, x0, y0, x1, y1, color='black', dashlen=5, ratio=2): 
         dx=x1-x0 # delta x
         dy=y1-y0 # delta y
-        # calcolo sunghezza segmento
+        # calcolo lunghezza segmento
         if dy==0:
             len=abs(dx)
         elif dx==0:

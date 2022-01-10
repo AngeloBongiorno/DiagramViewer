@@ -36,17 +36,17 @@ class Shape:
     # perché mostrati nella rappresentazione grafica del diagramma
     def match_stereotypes(self, stypes):
         for stereotype in stypes:
-            self.stereotypes.append(stereotype.attrib['Name'])
+            self.stereotypes.append(stereotype.get('Name'))
 
     # serve ad aggiungere alla shape eventuale elenco di attributes e operations che implementa, questi sono necessari
     # perché mostrati nella rappresentazione grafica del diagramma
     def match_attributes_operations(self, model_children):
         for model_child in model_children:
             if model_child.tag == 'Attribute':
-                attr = Attribute(model_child.attrib['Name'], model_child.attrib['Visibility'])
+                attr = Attribute(model_child.get('Name'), model_child.get('Visibility'))
                 self.attributes.append(attr)
             if model_child.tag == 'Operation':
-                op = Operation(model_child.attrib['Name'], model_child.attrib['Visibility'])
+                op = Operation(model_child.get('Name'), model_child.get('Visibility'))
                 self.operations.append(op)
 
 class Attribute:
@@ -84,11 +84,12 @@ class Operation:
 
 class Connector:
 
-    def __init__(self, tag: str, coordinates: List[Tuple], color: str, weight: float) -> None:
+    def __init__(self, tag: str, coordinates: List[Tuple], color: str, weight: float, aggregation_kind: str = 'None') -> None:
         self.tag = tag
         self.coordinates = coordinates
         self.color = color
         self.weight = weight
+        self.aggregation_kind = aggregation_kind
 
 class Diagram:
 
