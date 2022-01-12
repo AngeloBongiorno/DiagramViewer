@@ -12,11 +12,13 @@ class Generator:
 
     def draw_diagram(self):
         
-        img = self._draw_background(self.diagram.background)
+    #    img = self._draw_background(self.diagram.background)
+        img = Image.new('RGB', [884,520],'white')
         if len(self.diagram.shapes) != 0:
             img = self._draw_shapes(img, self.diagram.shapes)
         if len(self.diagram.connectors) != 0:
             img = self._draw_connectors(img, self.diagram.connectors)
+        
         img.show()
 
     

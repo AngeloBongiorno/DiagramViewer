@@ -53,21 +53,39 @@ class Parser:
     def parse(self) -> Diagram: # nell'argomento andrebbe inserito anche il path
         self.tree = ET.parse('./assets/class_diagram_3.xml')
         self.root = self.tree.getroot()
-        self.background = self._make_background()
         self.shapes = self._make_shapes()
         self.connectors = self._make_connectors()
+        self.background = self._make_background()
         return Diagram(self.background, self.shapes, self.connectors) 
 
 
-    def _parse_background(self) -> typing.Tuple:
-        self.bg_width = int(self.root[2][0].get(XA.WIDTH))
-        self.bg_height = int(self.root[2][0].get(XA.HEIGHT))
-        self.bg_color = self.root[2][0].get(XA.DIAGRAMBACKGROUND)
-        return self.bg_width, self.bg_height, self.bg_color
+    def _compute_bg_borders(self) -> Tuple:
+        xmin = self.shapes[0].x
+        xmax = self.shapes[0].x + self.shapes[0].width
+        ymin = self.shapes[0].y
+        ymax = self.shapes[0].y + self.shapes[0].height
+        for shape in self.shapes:
+            if shape.x < xmin:
+                xmin = shape.x
+                print('questa è la xmin '+ str(xmin))
+            if shape.x + shape.width > xmax:
+                xmax = shape.x + shape.width
+                print('questa è la xmax '+ str(xmax))
+            if shape.y < ymin:
+                ymin = shape.y
+                print('questa è la ymin '+ str(ymin))
+            if shape.y + shape.height > ymax:
+                ymax = shape.y + shape.height
+                print('questa è la ymax '+ str(ymax))
+        width = xmax + xmin
+        height = ymax + ymin
+        return width, height
+
 
     def _make_background(self) -> Background:
-        attributes = self._parse_background()
-        self.bg = Background(attributes[0],attributes[1],attributes[2])
+        dimensioni = self._compute_bg_borders()
+        self.bg_color = self.root[2][0].get(XA.DIAGRAMBACKGROUND)
+        self.bg = Background(dimensioni[0], dimensioni[1], self.bg_color)
         return self.bg
     
     # shapes:
@@ -85,12 +103,12 @@ class Parser:
 
 
     def _make_shapes(self) -> List[Shape]:
-        _shape_list = []
+        self._shape_list = []
         if self.root[2][0].find(XT.SHAPES):
             for index, element in enumerate(self.root[2][0].find(XT.SHAPES)):
                 _outline = self._parse_line(element.find(XT.LINE))
                 _element_font = self._parse_element_font(element.find(XT.ELEMENTFONT))
-                _shape_list.append(Shape(element.get(XA.NAME), element.get(XA.MODEL), float(element.get(XA.X)), float(element.get(XA.Y)),
+                self._shape_list.append(Shape(element.get(XA.NAME), element.get(XA.MODEL), float(element.get(XA.X)), float(element.get(XA.Y)),
                     element.get(XA.BACKGROUND), float(element.get(XA.WIDTH)), float(element.get(XA.HEIGHT)),
                     element.get(XA.PRIMITIVESHAPETYPE), _outline[0], int(float(_outline[1])), _element_font[0], int(_element_font[1]), _element_font[2]))
 
@@ -102,10 +120,10 @@ class Parser:
                         # Trovata, scorre tutte le sottoclassi dell'elemento fino a trovare la sottoclasse 'Stereotypes'
                         for sub_class in class_instance:
                             if sub_class.tag == XT.STEREOTYPES:
-                                _shape_list[index].match_stereotypes(sub_class)
+                                self._shape_list[index].match_stereotypes(sub_class)
                             if sub_class.tag == XT.MODELCHILDREN:
-                                _shape_list[index].match_attributes_operations(sub_class)
-        return _shape_list
+                                self._shape_list[index].match_attributes_operations(sub_class)
+        return self._shape_list
 
 
 
