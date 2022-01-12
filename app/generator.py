@@ -1,8 +1,6 @@
-from typing import Any, List, Tuple
+from typing import List, Tuple
 from PIL import Image, ImageDraw, ImageFont
 from model import Connector, Shape
-import re
-import numpy as np
 import math
 from model import Background, Diagram
 
@@ -14,78 +12,86 @@ class Generator:
 
     def draw_diagram(self):
         
-        img = self.draw_background(self.diagram.background)
+        img = self._draw_background(self.diagram.background)
         if len(self.diagram.shapes) != 0:
-            img = self.draw_shapes(img, self.diagram.shapes)
+            img = self._draw_shapes(img, self.diagram.shapes)
         if len(self.diagram.connectors) != 0:
-            img = self.draw_connectors(img, self.diagram.connectors)
+            img = self._draw_connectors(img, self.diagram.connectors)
         img.show()
 
-    # funzione sfondo
-    def draw_background(self, bg_info: Background) -> Image:
+    
+    def _draw_background(self, bg_info: Background) -> Image:
         size = (bg_info.width, bg_info.height)
         bg = Image.new('RGBA', size, bg_info.background_color)
-        #bg_info.background_color
         return bg
     
-    def draw_connectors(self, base_img: Image, connectors: List[Connector]) -> Image:
+    def _draw_connectors(self, base_img: Image, connectors: List[Connector]) -> Image:
         img = ImageDraw.Draw(base_img)
         for connector in connectors:
 
             match connector.tag:
                 case 'Generalization':
-                    self.draw_generalization(connector, img)
+                    self._draw_generalization(connector, img)
                 case 'Composition':
-                    self.draw_composition(connector, img)
+                    self._draw_composition(connector, img)
                 case 'Realization':
-                    self.draw_realization(connector, img)
+                    self._draw_realization(connector, img)
                 case 'Dependency':
-                    self.draw_dependency(connector, img)
+                    self._draw_dependency(connector, img)
                 case 'Association':
-                    self.draw_association(connector, img)
+                    self._draw_association(connector, img)
                 case 'Aggregation':
-                    self.draw_aggregation(connector, img)
+                    self._draw_aggregation(connector, img)
+                case 'Instantiation':
+                    self._draw_instantiation(connector, img)
                 case _:
-                    self.draw_association(connector, img)
-             
-            #for index, current_coordinates in enumerate(connector.coordinates):
-            #    if index + 1 < len(connector.coordinates):
-
-            #        self.dashed_line(img, current_coordinates[0], current_coordinates[1],
-            #        connector.coordinates[index+1][0], connector.coordinates[index+1][1])
-            #   oppure
-            #        img.line([(current_coordinates[0], current_coordinates[1]),
-            #            (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill='red', width = 0)
+                    self._draw_association(connector, img)
   
         return base_img
 
-    def draw_realization(self, connector: Connector, img: ImageDraw):
+
+    def _draw_instantiation(self, connector: Connector,img: ImageDraw):
+
+        connector.coordinates.reverse()
+
         for index, coordinates in enumerate(connector.coordinates):
             if index + 1 < len(connector.coordinates):
                 if index!= 0:
-                    self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
+                    self._dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
                 else:
-                    self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
-                    #angle = self.angle_between((coordinates[0],coordinates[1]), (connector.coordinates[index+1][0],connector.coordinates[index+1][1]))
+                    font = ImageFont.truetype("./assets/fonts/arial.ttf",  10)
+                    img.text([connector.caption_x, connector.caption_y],'<<Instantiate>>', 'black', font, anchor='lm')
+                    self._dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
+                    self._empty_triangle(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), connector.color)
 
-                    self.draw_triangle(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'red', connector.color)
-                    #img.regular_polygon((coordinates[0], coordinates[1], 8), 3, rotation=angle, fill='red', outline='Black')
-                    # ^ questo triangolo è storto perché il metodo angle_between va fixato
-
-
-    # TODO implementare correttamente
-
-    def angle_between(self, a: Tuple, b: Tuple):
-        return np.rad2deg(np.arctan2(abs(b[1]-a[1]),b[0]-a[0]))
-
-
-    def draw_dependency(self, connector: Connector, img: ImageDraw):
+    def _draw_realization(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
-                if index + 1 < len(connector.coordinates):
-                    self.dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
-                    #aggiungere freccia non chiusa
+            if index + 1 < len(connector.coordinates):
+                if index!= 0:
+                    self._dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
+                else:
+                    self._dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
 
-    def draw_composition(self, connector: Connector, img: ImageDraw):
+                    self._triangle(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), connector.bg_color, connector.color)
+
+
+
+
+    def _draw_dependency(self, connector: Connector, img: ImageDraw):
+
+        connector.coordinates.reverse()
+
+        for index, coordinates in enumerate(connector.coordinates):
+            if index + 1 < len(connector.coordinates):
+                if index != 0:
+                    self._dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
+                    
+                else:
+                    self._dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
+                    self._empty_triangle(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), connector.color)
+                    
+
+    def _draw_composition(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
             if index + 1 < len(connector.coordinates):
                 if index != 0:
@@ -94,10 +100,10 @@ class Generator:
                 else:
                     img.line([(coordinates[0], coordinates[1]),
                         (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
-                    self.draw_rhombus(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'black', connector.color)
+                    self._rhombus(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'black', connector.color)
 
 
-    def draw_association(self, connector: Connector, img: ImageDraw):
+    def _draw_association(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
             if index + 1 < len(connector.coordinates):
                 if index != 0:
@@ -107,13 +113,13 @@ class Generator:
                     img.line([(coordinates[0], coordinates[1]),
                         (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
                     if connector.aggregation_kind == 'Shared':
-                        self.draw_rhombus(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'white', connector.color)
+                        self._rhombus(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'white', connector.color)
                     elif connector.aggregation_kind == 'Composited':
-                        self.draw_rhombus(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'black', connector.color)
+                        self._rhombus(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'black', connector.color)
                     
                 
 
-    def draw_aggregation(self, connector: Connector, img: ImageDraw):
+    def _draw_aggregation(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
             if index + 1 < len(connector.coordinates):
                 if index != 0:
@@ -122,9 +128,9 @@ class Generator:
                 else:
                     img.line([(coordinates[0], coordinates[1]),
                         (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
-                    self.draw_rhombus(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'white', connector.color)
+                    self._rhombus(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'white', connector.color)
 
-    def draw_generalization(self, connector: Connector, img: ImageDraw):
+    def _draw_generalization(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
             if index + 1 < len(connector.coordinates):
                 if index != 0:
@@ -135,43 +141,46 @@ class Generator:
                         (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
                     #angle = self.angle_between((coordinates[0],coordinates[1]), (connector.coordinates[index+1][0],connector.coordinates[index+1][1]))
                     
-                    self.draw_triangle(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'white', connector.color)
-                    #img.regular_polygon((coordinates[0], coordinates[1], 8), 3, rotation=angle, fill='white', outline=connector.color)
-                    # ^ questo triangolo è storto perché il metodo angle_between va fixato
+                    self._triangle(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'white', connector.color)
+                    
 
-    def draw_triangle(self,  img: ImageDraw, ptA: Tuple, ptB: Tuple, color: str, outline: str):
-        #coordinate punti
-        x0, y0 = ptA
-        x1, y1 = ptB
+    def _triangle(self,  img: ImageDraw, ptA: Tuple, ptB: Tuple, color: str, outline: str):
+    
+        vertici = self._find_arrowhead_points(ptA, ptB)
 
-        #coordinate dell'intersezione linea - base del triangolo
-        xb = 0.70*(x1-x0)+x0
-        yb = 0.70*(y1-y0)+y0
+        img.polygon([vertici[0], vertici[1], ptB], fill=color, outline=outline)
 
-        #controlla se la linea è verticale o orizzontale
-        if x0==x1:
-           vtx0 = (xb-5, yb)
-           vtx1 = (xb+5, yb)
-        elif y0==y1:
-           vtx0 = (xb, yb+5)
-           vtx1 = (xb, yb-5)
-        else:
-           alpha = math.atan2(y1-y0,x1-x0) - 90*math.pi/180
-           a = 6*math.cos(alpha)
-           b = 6*math.sin(alpha)
-           vtx0 = (xb+a, yb+b)
-           vtx1 = (xb-a, yb-b)
 
-        img.polygon([vtx0, vtx1, ptB], fill=color, outline=outline)
+    def _empty_triangle(self, img: ImageDraw, ptA: Tuple, ptB: Tuple, outline: str):
 
-    def draw_rhombus(self,  img: ImageDraw, ptA: Tuple, ptB: Tuple, color: str, outline: str):
+        vertici = self._find_arrowhead_points(ptA, ptB)
+
+        img.line([ptB,vertici[0]], outline)
+        img.line([ptB,vertici[1]], outline)
+
+
+    def _rhombus(self,  img: ImageDraw, ptA: Tuple, ptB: Tuple, color: str, outline: str):
+
+        vertici = self._find_arrowhead_points(ptA, ptB)
+
+        deltax = vertici[2]-ptB[0]
+        deltay = vertici[3]-ptB[1]
+
+        rx = vertici[2] + deltax
+        ry = vertici[3] + deltay
+        r = (rx, ry)
+
+        img.polygon([vertici[0], r, vertici[1], ptB], fill=color, outline=outline)
+
+
+    def _find_arrowhead_points(self, ptA: Tuple, ptB: Tuple) -> Tuple:
 
         #coordinate punti inizio ultima linea
         x0, y0 = ptA
         #coorinate punta freccia
         x1, y1 = ptB
 
-        #coordinate dell'intersezione linea - base del triangolo
+        #coordinate dell'intersezione linea - base della punta
         xb = 0.80*(x1-x0)+x0
         yb = 0.80*(y1-y0)+y0
 
@@ -189,18 +198,15 @@ class Generator:
            vtx0 = (xb+a, yb+b)
            vtx1 = (xb-a, yb-b)
 
-        deltax = xb-x1
-        deltay = yb-y1
-
-        rx = xb + deltax
-        ry = yb + deltay
-        r = (rx, ry)
-
-        img.polygon([vtx0, r, vtx1, ptB], fill=color, outline=outline)
+        return vtx0, vtx1, xb, yb
 
 
 
-    def dashed_line(self, base_img: ImageDraw, x0, y0, x1, y1, color='black', dashlen=5, ratio=2): 
+    
+
+
+
+    def _dashed_line(self, base_img: ImageDraw, x0, y0, x1, y1, color='black', dashlen=5, ratio=2): 
         dx=x1-x0 # delta x
         dy=y1-y0 # delta y
         # calcolo lunghezza segmento
@@ -228,7 +234,8 @@ class Generator:
     #    if pattern.search(rgba_string):
     #        rgb_string = re.sub(   , ')', rgba_string)
 
-    def draw_shapes(self, base_img: Image, shapes: List[Shape]) -> Image:
+
+    def _draw_shapes(self, base_img: Image, shapes: List[Shape]) -> Image:
         img = ImageDraw.Draw(base_img)
 
         for shape in shapes:

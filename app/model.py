@@ -13,7 +13,7 @@ class Background:
 class Shape:
 
     def __init__(self, name: str, model: str, x: int, y: int, bgcolor: str, width: int, height: int,
-        primitive_shape_type: int, outline_color: str, outline_weight: float, element_font_name: str, font_size: int, text_color: str) -> None:
+        primitive_shape_type: int, outline_color: str, outline_weight: float, element_font_name: str, font_size: int, text_color: str):
 
         self.name = name
         self.model = model
@@ -84,11 +84,15 @@ class Operation:
 
 class Connector:
 
-    def __init__(self, tag: str, coordinates: List[Tuple], color: str, weight: float, aggregation_kind: str = 'None') -> None:
+    def __init__(self, tag: str, coordinates: List[Tuple], color: str, weight: float, font_size: int, caption_x: int, caption_y: int, aggregation_kind: str, bg_color: str = 'black'):
         self.tag = tag
         self.coordinates = coordinates
         self.color = color
+        self.bg_color = bg_color
         self.weight = weight
+        self.font_size = font_size
+        self.caption_x = caption_x
+        self.caption_y = caption_y
         self.aggregation_kind = aggregation_kind
 
 class Diagram:
