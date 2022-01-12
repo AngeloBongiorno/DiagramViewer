@@ -83,35 +83,27 @@ class Generator:
 
         for index, coordinates in enumerate(connector.coordinates):
             if index + 1 < len(connector.coordinates):
-                if index != 0:
-                    self._dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
-                    
-                else:
-                    self._dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
+                self._dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
+                if index == 0:
                     self._empty_triangle(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), connector.color)
+                    
                     
 
     def _draw_composition(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
             if index + 1 < len(connector.coordinates):
-                if index != 0:
-                    img.line([(coordinates[0], coordinates[1]),
-                        (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
-                else:
-                    img.line([(coordinates[0], coordinates[1]),
-                        (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
+                img.line([(coordinates[0], coordinates[1]), (connector.coordinates[index+1][0],
+                        connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
+                if index == 0:
                     self._rhombus(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'black', connector.color)
 
 
     def _draw_association(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
             if index + 1 < len(connector.coordinates):
-                if index != 0:
-                    img.line([(coordinates[0], coordinates[1]),
-                        (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
-                else:
-                    img.line([(coordinates[0], coordinates[1]),
-                        (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
+                img.line([(coordinates[0], coordinates[1]), (connector.coordinates[index+1][0],
+                        connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
+                if index == 0:
                     if connector.aggregation_kind == 'Shared':
                         self._rhombus(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'white', connector.color)
                     elif connector.aggregation_kind == 'Composited':
@@ -122,25 +114,18 @@ class Generator:
     def _draw_aggregation(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
             if index + 1 < len(connector.coordinates):
-                if index != 0:
-                    img.line([(coordinates[0], coordinates[1]),
-                        (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
-                else:
-                    img.line([(coordinates[0], coordinates[1]),
-                        (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
+                img.line([(coordinates[0], coordinates[1]), (connector.coordinates[index+1][0],
+                        connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
+                if index == 0:
                     self._rhombus(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'white', connector.color)
+
 
     def _draw_generalization(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
             if index + 1 < len(connector.coordinates):
-                if index != 0:
-                    img.line([(coordinates[0], coordinates[1]),
-                            (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
-                else:
-                    img.line([(coordinates[0], coordinates[1]),
-                        (connector.coordinates[index+1][0], connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
-                    #angle = self.angle_between((coordinates[0],coordinates[1]), (connector.coordinates[index+1][0],connector.coordinates[index+1][1]))
-                    
+                img.line([(coordinates[0], coordinates[1]), (connector.coordinates[index+1][0],
+                        connector.coordinates[index+1][1])], fill=connector.color, width = connector.weight)
+                if index == 0:
                     self._triangle(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'white', connector.color)
                     
 
