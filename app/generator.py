@@ -44,26 +44,34 @@ class Generator:
                 case 'Aggregation':
                     self._draw_aggregation(connector, img)
                 case 'Instantiation':
-                    self._draw_instantiation(connector, img)
+                    self._draw_connector_with_caption(connector, img, "<<instantiate>>")
+                case 'Usage':
+                    self._draw_connector_with_caption(connector, img, "<<use>>")
+                case 'Abstraction':
+                    self._draw_connector_with_caption(connector, img, "<<abstraction>>")
+                case 'BindingDependency':
+                    self._draw_connector_with_caption(connector, img, "<<bind>>")
+                case 'Import':
+                    self._draw_connector_with_caption(connector, img, "<<import>>")
+                case 'Substitution':
+                    self._draw_connector_with_caption(connector, img, "<<substitute>>")
+                case 'Permission':
+                    self._draw_connector_with_caption(connector, img, "<<permit>>")
+                case 'Derive':
+                    self._draw_connector_with_caption(connector, img, "<<derive>>")
+                case 'Merge':
+                    self._draw_connector_with_caption(connector, img, "<<merge>>")
+                case 'Access':
+                    self._draw_connector_with_caption(connector, img, "<<access>>")
+                case 'Refine':
+                    self._draw_connector_with_caption(connector, img, "<<refine>>")
+                case 'Trace':
+                    self._draw_connector_with_caption(connector, img, "<<trace>>")
                 case _:
                     self._draw_association(connector, img)
   
         return base_img
 
-
-    def _draw_instantiation(self, connector: Connector,img: ImageDraw):
-
-        connector.coordinates.reverse()
-
-        for index, coordinates in enumerate(connector.coordinates):
-            if index + 1 < len(connector.coordinates):
-                if index!= 0:
-                    self._dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
-                else:
-                    font = ImageFont.truetype("./assets/fonts/arial.ttf",  10)
-                    img.text([connector.caption_x, connector.caption_y],'<<Instantiate>>', 'black', font, anchor='lm')
-                    self._dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
-                    self._empty_triangle(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), connector.color)
 
     def _draw_realization(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
@@ -76,6 +84,20 @@ class Generator:
                     self._triangle(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), connector.bg_color, connector.color)
 
 
+
+    def _draw_connector_with_caption(self, connector: Connector, img: ImageDraw, caption: str):
+
+        connector.coordinates.reverse()
+
+        for index, coordinates in enumerate(connector.coordinates):
+            if index + 1 < len(connector.coordinates):
+                if index!= 0:
+                    self._dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
+                else:
+                    font = ImageFont.truetype("./assets/fonts/arial.ttf",  10)
+                    img.text([connector.caption_x, connector.caption_y], caption, 'black', font, anchor='lm')
+                    self._dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
+                    self._empty_triangle(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), connector.color)
 
 
     def _draw_dependency(self, connector: Connector, img: ImageDraw):

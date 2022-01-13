@@ -48,7 +48,7 @@ class Parser:
 
         #funzione da parametrizzare con input del file inviato dall'utente
     def parse(self) -> Diagram: 
-        self.tree = ET.parse('./assets/prova_attr_op.xml')
+        self.tree = ET.parse('./assets/class_diagram_3.xml')
         self.root = self.tree.getroot()
         self.shapes = self._make_shapes()
         self.connectors = self._make_connectors()
