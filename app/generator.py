@@ -12,8 +12,7 @@ class Generator:
 
     def draw_diagram(self):
         
-    #    img = self._draw_background(self.diagram.background)
-        img = Image.new('RGB', [884,520],'white')
+        img = self._draw_background(self.diagram.background)
         if len(self.diagram.shapes) != 0:
             img = self._draw_shapes(img, self.diagram.shapes)
         if len(self.diagram.connectors) != 0:
@@ -194,6 +193,7 @@ class Generator:
 
 
     def _dashed_line(self, base_img: ImageDraw, x0, y0, x1, y1, color='black', dashlen=5, ratio=2): 
+        
         dx=x1-x0 # delta x
         dy=y1-y0 # delta y
         # calcolo lunghezza segmento
@@ -203,9 +203,12 @@ class Generator:
             len=abs(dy)
         else:
             len=math.sqrt(dx*dx+dy*dy)
-        xa=dx/len # x add for 1px line length
-        ya=dy/len # y add for 1px line length
+
+        xa=dx/len
+        ya=dy/len
+
         step=dashlen*ratio # lunghezza spazio tra trattini
+        
         a0=0
         while a0<len:
             a1=a0+dashlen
