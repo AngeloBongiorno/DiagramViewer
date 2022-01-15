@@ -8,8 +8,10 @@ class Generator:
 
     def __init__(self, diagram: Diagram) -> None:
         self.diagram = diagram
-        pass
 
+
+    # richiama funzioni per disegnare background, shapes e connectors
+    # attualmente img.show() mostra a schermo il diagramma risultante
     def draw_diagram(self):
         
         img = self._draw_background(self.diagram.background)
@@ -20,14 +22,18 @@ class Generator:
         
         img.show()
 
-    
+
+    # crea lo sfondo del diagramma da un background
     def _draw_background(self, bg_info: Background) -> Image:
         size = (bg_info.width, bg_info.height)
         bg = Image.new('RGBA', size, bg_info.background_color)
         return bg
     
+
+    # crea connectors da una lista di connectors
     def _draw_connectors(self, base_img: Image, connectors: List[Connector]) -> Image:
         img = ImageDraw.Draw(base_img)
+
         for connector in connectors:
 
             match connector.tag:
@@ -72,6 +78,9 @@ class Generator:
   
         return base_img
 
+
+
+    # metodi che disegnano i vari tipi di frecce in un diagramma
 
     def _draw_realization(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
@@ -152,6 +161,9 @@ class Generator:
                     self._triangle(img,(connector.coordinates[index+1][0], connector.coordinates[index+1][1]), (coordinates[0], coordinates[1]), 'white', connector.color)
                     
 
+
+    # metodi che disegnano le punte delle frecce
+
     def _triangle(self,  img: ImageDraw, ptA: Tuple, ptB: Tuple, color: str, outline: str):
     
         vertici = self._find_arrowhead_points(ptA, ptB)
@@ -181,6 +193,9 @@ class Generator:
         img.polygon([vertici[0], r, vertici[1], ptB], fill=color, outline=outline)
 
 
+
+
+    # metodo che trova i vertici per costruire le punte delle frecce
     def _find_arrowhead_points(self, ptA: Tuple, ptB: Tuple) -> Tuple:
 
         #coordinate punti inizio ultima linea
@@ -212,8 +227,7 @@ class Generator:
 
     
 
-
-
+    # metodo che disegna linea tratteggiata
     def _dashed_line(self, base_img: ImageDraw, x0, y0, x1, y1, color='black', dashlen=5, ratio=2): 
         
         dx=x1-x0 # delta x
@@ -247,6 +261,7 @@ class Generator:
     #        rgb_string = re.sub(   , ')', rgba_string)
 
 
+    # crea connectors da una lista di connectors
     def _draw_shapes(self, base_img: Image, shapes: List[Shape]) -> Image:
         img = ImageDraw.Draw(base_img)
 

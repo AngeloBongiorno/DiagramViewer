@@ -43,11 +43,15 @@ class XA:
 
 class Parser:
 
+
+    
     def __init__(self):
         pass
 
-        #funzione da parametrizzare con input del file inviato dall'utente
+        
+    # il metodo parse() è da parametrizzare con l'indirizzo del file xml che invia l'utente
     def parse(self) -> Diagram: 
+        #al posto dells stringa './assets/class_diagram_3.xml' va inserito l'indirizzo del file fornito dell'utente
         self.tree = ET.parse('./assets/class_diagram_3.xml')
         self.root = self.tree.getroot()
         self.shapes = self._make_shapes()
@@ -55,6 +59,9 @@ class Parser:
         self.background = self._make_background()
         return Diagram(self.background, self.shapes, self.connectors) 
 
+
+    # definisce dimensioni dell'immagine in base alla posizione delle
+    # shape che si trovano agli estremi del diagramma
 
     def _compute_bg_borders(self) -> Tuple:
 
@@ -77,19 +84,23 @@ class Parser:
         height = ymax + ymin
         return width, height
 
-
+    
+    # crea oggetto Background
     def _make_background(self) -> Background:
         dimensioni = self._compute_bg_borders()
         bg_color = self.root[2][0].get(XA.DIAGRAMBACKGROUND)
         bg = Background(int(dimensioni[0]), int(dimensioni[1]), bg_color)
         return bg
     
-    # shapes:
+
+    # colore e spessore della linea
     def _parse_line(self, line_tag: ET.Element) -> Tuple[str, float]:
         line_color = line_tag.get(XA.COLOR)
         line_weight = line_tag.get(XA.WEIGHT)
         return line_color, line_weight
 
+
+    # nome del font, dimensione e colore del testo
     def _parse_element_font(self, element_font_tag: ET.Element) -> Tuple[str, int, str]:
         element_font_name = element_font_tag.get(XA.NAME)
         element_font_size = element_font_tag.get(XA.SIZE)
@@ -98,6 +109,7 @@ class Parser:
 
 
 
+    # crea una lista di shapes
     def _make_shapes(self) -> List[Shape]:
         shape_list = []
         if self.root[2][0].find(XT.SHAPES):
@@ -110,9 +122,6 @@ class Parser:
 
                 model = element.get(XA.MODEL)
 
-                #for class_instance in self.root.find(XT.MODELS):
-                #    if class_instance.get(XA.ID) == model:
-
                 for class_instance in self.root.findall("./Models/*[@Id='"+model+"']"):
                         # Trovata, scorre tutte le sottoclassi dell'elemento fino a trovare la sottoclasse 'Stereotypes'
                         for sub_class in class_instance:
@@ -124,7 +133,7 @@ class Parser:
 
 
 
-        # connectors:
+    # crea una lista di connectors
     def _make_connectors(self) -> List[Connector]:
         connector_list = []
         if self.root[2][0].find(XT.CONNECTORS):
@@ -154,6 +163,7 @@ class Parser:
                             for x in association.find(XT.FROMEND):
                                 aggregation_kind = x.get(XA.AGGREGATIONKIND)
 
-                connector_list.append(Connector(element.tag, connector_coordinates, color_and_weight[0], int(float(color_and_weight[1])), int(float( font_size)), int(float(caption_x)), int(float(caption_y)), aggregation_kind, element.get(XA.BACKGROUND)))
+                connector_list.append(Connector(element.tag, connector_coordinates, color_and_weight[0],
+                    int(float(color_and_weight[1])), int(float(font_size)), int(float(caption_x)), int(float(caption_y)), aggregation_kind, element.get(XA.BACKGROUND)))
 
         return connector_list

@@ -1,1 +1,7 @@
 __pycache__/
+
+# xml testing files
+*.xml
+
+# Visual Studio Code
+.vscode/*
