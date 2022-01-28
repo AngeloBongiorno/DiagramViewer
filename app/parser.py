@@ -52,7 +52,7 @@ class Parser:
     # il metodo parse() è da parametrizzare con l'indirizzo del file xml che invia l'utente
     def parse(self) -> Diagram: 
         #al posto dells stringa './assets/class_diagram_3.xml' va inserito l'indirizzo del file fornito dell'utente
-        self.tree = ET.parse('./assets/class_diagram_3.xml')
+        self.tree = ET.parse('./assets/test_2.xml')
         self.root = self.tree.getroot()
         self.shapes = self._make_shapes()
         self.connectors = self._make_connectors()

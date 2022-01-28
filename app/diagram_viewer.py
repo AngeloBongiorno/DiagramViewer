@@ -4,8 +4,6 @@ from parser import Parser
 
 # file principale che richiama tutte le classi
 
-
-
 parser = Parser()
 
 # il metodo parse() è da parametrizzare con l'indirizzo del file xml che invia l'utente

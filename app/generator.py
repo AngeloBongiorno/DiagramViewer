@@ -289,19 +289,21 @@ class Generator:
                     w, h = img.textsize(stereotype)
                     img.text([shape.x+ (shape.width-w)/2, shape.y-h], "<<"+stereotype+">>", fill=shape.text_color, font=font)
 
-            a=0
+            a=5 # 5 pixel di distanza rispetto alla linea sotto il nome della classe 
 
             if shape.attributes:
                 for attribute in shape.attributes:
                     w, h = img.textsize(attribute.name)
                     img.text([shape.x, shape.y+h+a], attribute.visibility+' '+attribute.name, fill=shape.text_color, font=font, anchor='lt')
-                    a+=h+1
-                img.line([shape.x, shape.y+h+a, shape.x+shape.width, shape.y+h+a], fill = shape.outline_color)
+                    a+=h+5
+                if shape.operations:
+                    img.line([shape.x, shape.y+h+a, shape.x+shape.width, shape.y+h+a], fill = shape.outline_color)
+                    a = a+5
 
             if shape.operations:
                 for operation in shape.operations:
                     w, h = img.textsize(operation.name)
                     img.text([shape.x, shape.y+h+a], operation.visibility+' '+operation.name, fill=shape.text_color, font=font, anchor='lt')
-                    a+=h+1
+                    a+=h+5
 
         return base_img
