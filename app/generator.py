@@ -37,42 +37,44 @@ class Generator:
         for connector in connectors:
 
             match connector.tag:
-                case 'Generalization':
-                    self._draw_generalization(connector, img)
-                case 'Composition':
-                    self._draw_composition(connector, img)
-                case 'Realization':
-                    self._draw_realization(connector, img)
-                case 'Dependency':
-                    self._draw_dependency(connector, img)
-                case 'Association':
-                    self._draw_association(connector, img)
-                case 'Aggregation':
-                    self._draw_aggregation(connector, img)
-                case 'Instantiation':
-                    self._draw_connector_with_caption(connector, img, "<<instantiate>>")
-                case 'Usage':
-                    self._draw_connector_with_caption(connector, img, "<<use>>")
                 case 'Abstraction':
                     self._draw_connector_with_caption(connector, img, "<<abstraction>>")
-                case 'BindingDependency':
-                    self._draw_connector_with_caption(connector, img, "<<bind>>")
-                case 'Import':
-                    self._draw_connector_with_caption(connector, img, "<<import>>")
-                case 'Substitution':
-                    self._draw_connector_with_caption(connector, img, "<<substitute>>")
-                case 'Permission':
-                    self._draw_connector_with_caption(connector, img, "<<permit>>")
-                case 'Derive':
-                    self._draw_connector_with_caption(connector, img, "<<derive>>")
-                case 'Merge':
-                    self._draw_connector_with_caption(connector, img, "<<merge>>")
                 case 'Access':
                     self._draw_connector_with_caption(connector, img, "<<access>>")
+                case 'Aggregation':
+                    self._draw_aggregation(connector, img)
+                case 'Association':
+                    self._draw_association(connector, img)
+                case 'BindingDependency':
+                    self._draw_connector_with_caption(connector, img, "<<bind>>")
+                case 'Composition':
+                    self._draw_composition(connector, img)
+                case 'Constraint':
+                    self._draw_constraint(connector, img)
+                case 'Dependency':
+                    self._draw_dependency(connector, img)
+                case 'Derive':
+                    self._draw_connector_with_caption(connector, img, "<<derive>>")
+                case 'Generalization':
+                    self._draw_generalization(connector, img)
+                case 'Import':
+                    self._draw_connector_with_caption(connector, img, "<<import>>")
+                case 'Instantiation':
+                    self._draw_connector_with_caption(connector, img, "<<instantiate>>")
+                case 'Merge':
+                    self._draw_connector_with_caption(connector, img, "<<merge>>")
+                case 'Permission':
+                    self._draw_connector_with_caption(connector, img, "<<permit>>")
+                case 'Realization':
+                    self._draw_realization(connector, img)
                 case 'Refine':
                     self._draw_connector_with_caption(connector, img, "<<refine>>")
+                case 'Substitution':
+                    self._draw_connector_with_caption(connector, img, "<<substitute>>")
                 case 'Trace':
                     self._draw_connector_with_caption(connector, img, "<<trace>>")
+                case 'Usage':
+                    self._draw_connector_with_caption(connector, img, "<<use>>")
                 case _:
                     self._draw_association(connector, img)
   
@@ -81,6 +83,15 @@ class Generator:
 
 
     # metodi che disegnano i vari tipi di frecce in un diagramma
+
+
+    def _draw_constraint(self, connector: Connector, img: ImageDraw):
+        for index, coordinates in enumerate(connector.coordinates):
+            if index + 1 < len(connector.coordinates):
+                self._dashed_line(img, coordinates[0], coordinates[1], connector.coordinates[index+1][0], connector.coordinates[index+1][1], color = connector.color)
+            
+
+
 
     def _draw_realization(self, connector: Connector, img: ImageDraw):
         for index, coordinates in enumerate(connector.coordinates):
@@ -298,7 +309,7 @@ class Generator:
                     a+=h+5
                 if shape.operations:
                     img.line([shape.x, shape.y+h+a, shape.x+shape.width, shape.y+h+a], fill = shape.outline_color)
-                    a = a+5
+                    a+=5
 
             if shape.operations:
                 for operation in shape.operations:
